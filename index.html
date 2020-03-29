@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="jsscript/anime.js"></script>
+    <script type="text/javascript" src="jsscript/stimulus.umd.js"></script>
+    <script type="text/javascript" src="jsscript/stimulus/home_controller.js"></script>
+    <meta name="viewport" content="width=device-width, initail-scale=1">
+
+    <style>
+
+        .full-img-back{
+            max-width: 100%;
+            max-height: 100%;
+            min-height: 100vh;
+            background-repeat: no-repeat;
+            -webkit-background-size: cover;
+            background-position: center;
+        }
+
+        .appear-anim{
+            opacity: 0;
+            animation-duration: 2s;
+            animation-timing-function: ease-out;
+            animation-delay: 0.5s;
+            animation-iteration-count: 1;
+            animation-direction: normal;
+            animation-name: element-appear;
+            animation-fill-mode: forwards;
+        }
+
+        .normal-cover{
+            opacity: 0.6;
+            background-color: black;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+        #wel-background{
+
+            margin: 0px;
+            /*overflow: hidden;*/
+            background-color: black !important;
+
+            -webkit-user-select:none;
+            -moz-user-select:none;
+            -ms-user-select:none;
+            user-select:none;
+        }
+
+        .welcome-title{
+            font-size: 50px;
+            color: #fff;
+        }
+
+        .container-fluid{
+            min-height: 100vh;
+        }
+
+        .row{
+            min-height: 100vh;
+        }
+
+        /*.col {*/
+        /*min-height: 100vh;*/
+        /*margin-top: auto;*/
+        /*margin-bottom: auto;*/
+        /*}*/
+
+        .col-blink:hover {
+            color: #00ff00;
+            -webkit-animation: Glow 1.5s ease infinite alternate;
+            animation: Glow 1.5s ease infinite alternate;
+        }
+
+        @-webkit-keyframes element-appear {
+            0% {opacity: 0}
+            100% {opacity: 1}
+        }
+        @keyframes element-appear {
+            0% {opacity: 0}
+            100% {opacity: 1}
+        }
+
+        @-webkit-keyframes Glow {
+            from {
+                text-shadow:0 0 10px #fff,0 0 20px #fff,0 0 30px #fff,0 0 40px #00a67c,0 0 70px #00a67c,0 0 80px #00a67c,0 0 100px #00a67c,0 0 150px #00a67c;
+            }
+            to {
+                text-shadow:0 0 5px #fff,0 0 10px #fff,0 0 15px #fff,0 0 20px #00a67c,0 0 35px #00a67c,0 0 40px #00a67c,0 0 50px #00a67c,0 0 75px #00a67c;
+            }
+        }@keyframes Glow {
+             from {
+                 text-shadow:0 0 10px #fff,0 0 20px #fff,0 0 30px #fff,0 0 40px #00a67c,0 0 70px #00a67c,0 0 80px #00a67c,0 0 100px #00a67c,0 0 150px #00a67c;
+             }
+             to {
+                 text-shadow:0 0 5px #fff,0 0 10px #fff,0 0 15px #fff,0 0 20px #00a67c,0 0 35px #00a67c,0 0 40px #00a67c,0 0 50px #00a67c,0 0 75px #00a67c;
+             }
+         }
+
+
+        .dotChild{
+            /*            width: 100px;
+                        height: 100px;
+                        background-color: black;
+                        position: relative;*/
+            /*margin:1px;*/
+        }
+
+        .dot{
+            display: flex;
+            flex-wrap: wrap;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+        .iframe-custom-box{
+            position:absolute;
+            height: -webkit-fill-available;
+            background-color: white;
+            padding-right:2px;
+            padding-left:2px;
+            padding-top:2px;
+            padding-bottom:2px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body id="wel-background">
+
+<div class="full-img-back appear-anim" data-controller='home'>
+    <div class="full-img-back" style="height: 100%;width: 100%;position: fixed">
+    <canvas id="bgImgCanvas" style="width: inherit;height: inherit;"></canvas>
+</div>
+<div class="dot"></div>
+<div class="normal-cover">
+</div>
+<div class="container-fluid">
+    <div class="row align-items-center">
+        <div class="col-sm-4 col-blink display-4 text-center text-white align-self-center blog-div" data-action='click->home#blogAction'>Blog</button></div>
+        <div class="col-sm-4 col-blink display-4 text-center text-white align-self-center lab-div" data-action='click->home#laboratoryAction'>Laboratory</div>
+        <div class="col-sm-4 col-blink display-4 text-center text-white align-self-center about-div" data-action='click->home#aboutAction'>About</div>
+    </div>
+</div>
+</div>
+
+
+</body>
+</html>
