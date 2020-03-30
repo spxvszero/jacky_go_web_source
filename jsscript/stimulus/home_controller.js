@@ -8,6 +8,11 @@
         connect() {
             console.log("begin")
             this.backImageConnection()
+            var that = this;
+            window.onresize=function (size) {
+                console.log("resize?? ",size);
+                that.changeImg();
+            }
 
         }
 
@@ -226,7 +231,7 @@
         }
 
         loadBlogPage() {
-            fetch("/blog")
+            fetch("blog.html")
                 .then(response => response.text())
                 .then(html => {
 
@@ -235,6 +240,11 @@
 
                     var iframe = document.querySelector('.iframe-container')
                     iframe.innerHTML = doc.body.innerHTML
+
+                    for (let i = 0;i<doc.scripts.length;i++){
+                        eval(doc.scripts[i].text);
+                    }
+
                 })
         }
 
