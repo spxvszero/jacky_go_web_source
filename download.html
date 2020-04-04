@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="jsscript/bootstrap.min.css">
+    <script src="jsscript/jquery-3.4.1.slim.min.js"></script>
+    <script src="jsscript/popper.min.js"></script>
+    <script src="jsscript/bootstrap.min.js"></script>
 </head>
 <body onload="getDownloadDir()">
 
@@ -36,6 +36,11 @@
     var deepIdx
     var deepIdxArr = new Array()
 
+    let downloadJsonUrl = "http://localhost:8900/download/json";
+    let sharedUrl = "http://localhost:8900/shared";
+
+    var curPopoverObj;
+
     function getDownloadDir() {
         jkconsole("发送");
 
@@ -46,18 +51,17 @@
         xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                jsonObj = JSON.parse(this.responseText)
-                deepObjArr = jsonObj
-                deepIdx = 0
+                jsonObj = JSON.parse(this.responseText);
+                deepObjArr = jsonObj;
+                deepIdx = 0;
 
-                jkconsole(jsonObj)
+                jkconsole(jsonObj);
 
-                tableEnter()
+                tableEnter();
 
             }
         };
-        // xhttp.open("GET", "http://www.lifefordebug.com/goserver/download", true);
-        xhttp.open("GET", "http://localhost:8900/download/json", true);
+        xhttp.open("GET", downloadJsonUrl, true);
 
         xhttp.send();
 
@@ -175,9 +179,7 @@
 
     function createOp(td,obj) {
 
-        var downloadBtn = document.createElement("button")
-        downloadBtn.classList.add("btn","btn-primary")
-        downloadBtn.setAttribute("type","button")
+        var downloadBtn = createOpBtn();
         downloadBtn.innerHTML = "\n" +
             "<svg width=\"16px\" height=\"16px\" viewBox=\"0 0 16 16\" version=\"1.1\">\n" +
             "    <desc>Created with Sketch.</desc>\n" +
@@ -195,13 +197,11 @@
             return function () {
                 downloadAction(caller,obj);
             };
-        }(downloadBtn,obj)
-        td.appendChild(downloadBtn)
+        }(downloadBtn,obj);
+        td.appendChild(downloadBtn);
 
 
-        var perViewBtn = document.createElement("button")
-        perViewBtn.classList.add("btn","btn-primary")
-        perViewBtn.setAttribute("type","button")
+        var perViewBtn = createOpBtn();
         perViewBtn.innerHTML = "\n" +
             "<svg width=\"16px\" height=\"16px\" viewBox=\"0 0 16 16\" version=\"1.1\">\n" +
             "    <desc>Created with Sketch.</desc>\n" +
@@ -213,17 +213,15 @@
             "            </g>\n" +
             "        </g>\n" +
             "    </g>\n" +
-            "</svg>"
+            "</svg>";
         perViewBtn.onclick = function (caller,obj) {
             return function () {
                 // downloadAction(caller,obj);
             };
-        }(perViewBtn,obj)
-        td.appendChild(perViewBtn)
+        }(perViewBtn,obj);
+        td.appendChild(perViewBtn);
 
-        var sharedBtn = document.createElement("button")
-        sharedBtn.classList.add("btn","btn-primary")
-        sharedBtn.setAttribute("type","button")
+        var sharedBtn = createOpBtn();
         sharedBtn.innerHTML = "\n" +
             "<svg width=\"16px\" height=\"16px\" viewBox=\"0 0 16 16\" version=\"1.1\">\n" +
             "    <desc>Created with Sketch.</desc>\n" +
@@ -239,11 +237,21 @@
             "</svg>"
         sharedBtn.onclick = function (caller,obj) {
             return function () {
-                // downloadAction(caller,obj);
+                sharedAction(caller,obj);
             };
-        }(sharedBtn,obj)
-        td.appendChild(sharedBtn)
+        }(sharedBtn,obj);
+        td.appendChild(sharedBtn);
     }
+
+    function createOpBtn(btnId) {
+        var btn = document.createElement("button");
+        btn.classList.add("btn","btn-primary");
+        btn.setAttribute("type","button");
+        btn.setAttribute("style","margin:2px 5px;");
+        if (btnId)btn.setAttribute("id",btnId);
+        return btn;
+    }
+
 
     function downloadFileWithObj(btn,obj) {
         // var xhttp;
@@ -255,7 +263,15 @@
         //     }
         // };
         //
-        var url = "./download/json?filePath=" + obj["DirPath"] + '/' + obj["Name"]
+        var path = "";
+
+        if (obj["DirPath"] && obj["DirPath"].length > 0){
+            path = obj["DirPath"] + '/' + obj["Name"];
+        } else{
+            path = obj["Name"];
+        }
+
+        var url = downloadJsonUrl + "?filePath=" + path;
         //
         // xhttp.open("GET", url , true);
 
@@ -275,6 +291,50 @@
         downloadFileWithObj(caller,obj)
     }
 
+    function sharedAction(caller,obj) {
+        event.cancelBubble = true;
+
+        if (clearPopover(caller)) return;
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4) {
+                var title = "";
+                var content = "";
+                if (this.status == 200) {
+                    title = "Shared Success";
+                    content = sharedUrl + '/' + this.responseText;
+                }else{
+                    title = "Shared Failed";
+                    content = this.responseText;
+                }
+
+                $(caller).popover({
+                    "container": 'body',
+                    "title" : title,
+                    "content" : content,
+                    "placement" : "top"
+                }).popover("show");
+                curPopoverObj = caller;
+            }
+        };
+
+        var path = "";
+
+        if (obj["DirPath"] && obj["DirPath"].length > 0){
+            path = obj["DirPath"] + '/' + obj["Name"];
+        } else{
+            path = obj["Name"];
+        }
+
+        var url = sharedUrl + "?filePath=" + path;
+
+        xhttp.open("GET", url , true);
+
+        xhttp.send();
+
+    }
+
 
     function goDeep(row) {
 
@@ -282,54 +342,67 @@
           return
         }
 
-        deepIdx ++
-        deepIdxArr.push(row)
-        deepObjArr = deepObjArr[row]["SubFiles"]
+        deepIdx ++;
+        deepIdxArr.push(row);
+        deepObjArr = deepObjArr[row]["SubFiles"];
 
-        jkconsole("deepindex -- ",deepIdx," deepidxArr -- ",deepIdxArr," deepObj -- ",deepObjArr)
+        jkconsole("deepindex -- ",deepIdx," deepidxArr -- ",deepIdxArr," deepObj -- ",deepObjArr);
 
         reloadTable()
 
     }
 
     function reloadTable() {
-        var table = document.getElementById("table-body")
-        table.innerHTML=""
+        var table = document.getElementById("table-body");
+        table.innerHTML="";
 
-        tableEnter()
+        clearPopover();
+        tableEnter();
     }
 
     function goBackDeep() {
-        deepIdx --
+        deepIdx --;
 
         //find obj
-        var obj = jsonObj
+        var obj = jsonObj;
 
         if (deepIdx > 0){
             for (i=0;i<deepIdx;i++){
-                var row = deepIdxArr[i]
-                obj = obj[row]["SubFiles"]
-                jkconsole("searching deepindex -- ",deepIdx," deepidxArr -- ",deepIdxArr," deepObj -- ",obj)
+                var row = deepIdxArr[i];
+                obj = obj[row]["SubFiles"];
+                jkconsole("searching deepindex -- ",deepIdx," deepidxArr -- ",deepIdxArr," deepObj -- ",obj);
             }
         }
 
-        deepIdxArr.pop()
-        deepObjArr = obj
+        deepIdxArr.pop();
+        deepObjArr = obj;
 
-        jkconsole("deepindex -- ",deepIdx," deepidxArr -- ",deepIdxArr," deepObj -- ",obj)
+        jkconsole("deepindex -- ",deepIdx," deepidxArr -- ",deepIdxArr," deepObj -- ",obj);
         reloadTable()
     }
 
     function backToTopDir() {
-        deepIdx = 0
-        deepIdxArr=[]
-        deepObjArr = jsonObj
-        reloadTable()
+        deepIdx = 0;
+        deepIdxArr=[];
+        deepObjArr = jsonObj;
+        reloadTable();
     }
 
     function jkconsole(...args) {
         // console.log(args)
     }
+
+    function clearPopover(objCaller) {
+        if (curPopoverObj != null){
+            var sameObj = (objCaller == curPopoverObj);
+            $(curPopoverObj).popover("dispose");
+            curPopoverObj = null;
+
+            if (sameObj) return true;
+        }
+        return false;
+    }
+
 </script>
 
 </html>
