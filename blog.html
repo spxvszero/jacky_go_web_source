@@ -3,27 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.16.0/css/mdb.min.css" rel="stylesheet">
+    <!-- JQuery -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.16.0/js/mdb.min.js"></script>
+
     <title>Blog</title>
+
+    <style>
+
+        .blog-title{
+            display: none;
+        }
+
+        @media (min-width: 768px){
+            .blog-title{
+                display: inherit;
+            }
+        }
+
+        .blog-item{
+            /*margin-top: 25px;*/
+            /*margin-bottom: 25px;*/
+        }
+
+        .blog{
+            background-color: white;
+        }
+
+        .blog-item-title{
+            /*margin: 10px 10px 0px 10px;*/
+            padding: 10px 10px 0px 10px;
+        }
+        .blog-item-subtitle{
+            /*margin: 0px 10px 0px 10px;*/
+            padding: 0px 10px 0px 10px;
+            color: darkgray;
+            font-style: italic;
+        }
+        .blog-item-content{
+            /*margin: 0px 0px 10px 0px;*/
+            padding: 0px 10px 10px 10px;
+        }
+        .blog-item-content-toggle{
+            padding: 0px 10px 0px 10px;
+        }
+
+        .blog-item-margin{
+            margin:0px 0px 20px 0px;
+        }
+
+
+    </style>
 </head>
 <body>
 
-<div style="height: 500px;background-color: #00a67c">TESST</div>
-<div style="height: 500px;background-color: #123456">TESST</div>
-<div style="height: 500px;background-color: orange">TESST</div>
-<div style="height: 500px;background-color: blue">TESST</div>
-<div style="height: 500px;background-color: #00a67c">TESST</div>
-<div style="height: 500px;background-color: #00a67c">TESST</div>
-<div style="height: 500px;background-color: red">TESST</div>
-<div style="height: 500px;background-color: #00a67c">TESST</div>
-<div style="height: 500px;background-color: wheat">TESST</div>
-<div style="height: 500px;background-color: #00a67c">TESST</div>
-<div style="height: 500px;background-color: palegreen">TESST</div>
-<div style="height: 500px;background-color: #00a67c">TESST</div>
+<div class="container blog-title">
+    <h1 class="text-center">这是标题哦～</h1>
+</div>
+
+<div class="container">
+
+    <div class="blog wow animated fadeInUp z-depth-1">
+        <div data-toggle="collapse" href="#collapseExample" aria-expanded="true" aria-controls="collapseExample">
+            <h3 class="blog-item-title font-weight-bold">title</h3>
+            <div class="blog-item-subtitle font-weight-lighter">date and other info</div>
+            <div class="blog-item-content">content with image if have</div>
+        </div>
+        <div class="collapse blog-item-content-toggle" id="collapseExample">
+            <div class="mt-3">
+                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim
+                keffiyeh helvetica,
+                craft beer labore wes anderson cred nesciunt sapiente ea proident.
+            </div>
+        </div>
+        <div class="blog-item-margin"></div>
+    </div>
+
+    <div class="blog wow animated fadeInUp z-depth-1">
+        <div data-toggle="collapse" href="#collapseExample1" aria-expanded="true" aria-controls="collapseExample1">
+            <h3 class="blog-item-title font-weight-bold">title</h3>
+            <div class="blog-item-subtitle font-weight-lighter">date and other info</div>
+            <div class="blog-item-content">content with image if have content with image if have content with image if have content with image if have content with image if have
+                <img src="img/welcome_img/2.jpg" class="rounded" width="200px">
+            </div>
+        </div>
+        <div class="collapse blog-item-content-toggle" id="collapseExample1">
+            <div class="mt-3">
+                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim
+                keffiyeh helvetica,
+                craft beer labore wes anderson cred nesciunt sapiente ea proident.
+            </div>
+        </div>
+        <div class="blog-item-margin"></div>
+    </div>
+    <div style="height: 500px;background-color: orange" class="blog-item wow animated fadeInUp">TESST</div>
+    <div style="height: 500px;background-color: blue" class="blog-item wow animated fadeInUp">TESST</div>
+    <div style="height: 500px;background-color: #00a67c" class="blog-item wow animated fadeInUp">TESST</div>
+    <div style="height: 500px;background-color: #00a67c" class="blog-item wow animated fadeInUp">TESST</div>
+    <div style="height: 500px;background-color: red" class="blog-item wow animated fadeInUp" >TESST</div>
+    <div style="height: 500px;background-color: #00a67c" class="blog-item wow animated fadeInUp">TESST</div>
+    <div style="height: 500px;background-color: wheat" class="blog-item wow animated fadeInUp">TESST</div>
+    <div style="height: 500px;background-color: #00a67c" class="blog-item wow animated fadeInUp">TESST</div>
+    <div style="height: 500px;background-color: palegreen" class="blog-item wow animated fadeInUp">TESST</div>
+    <div style="height: 500px;background-color: #00a67c" class="blog-item wow animated fadeInUp">TESST</div>
+
+</div>
+
 
 
 </body>
+
+<script>
+    $(document).ready(function() {
+        new WOW().init();
+    });
+</script>
+
 </html>
