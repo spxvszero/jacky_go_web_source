@@ -303,7 +303,7 @@
                 var content = "";
                 if (this.status == 200) {
                     title = "Shared Success";
-                    content = sharedUrl + '/' + this.responseText;
+                    content = window.location.origin + '/' + sharedUrl+ '/' + this.responseText;
                 }else{
                     title = "Shared Failed";
                     content = this.responseText;

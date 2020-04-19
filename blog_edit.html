@@ -3,42 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="jsscript/pell.min.css">
+    <link rel="stylesheet" href="jsscript/bootstrap.min.css">
+    <script src="jsscript/jquery-3.4.1.slim.min.js"></script>
+    <script src="jsscript/popper.min.js"></script>
+    <script src="jsscript/bootstrap.min.js"></script>
+
     <title>Edit Page</title>
 
     <script src="jsscript/turndown.js"></script>
     <style>
         .pell-content {
-            height: 400px;
+            height: 300px;
         }
+        .pell{
+            background-color: white;
+        }
+        .editor-container{
+
+        }
+        .editor-previewer{
+            overflow: scroll;
+            /*height: calc(100vh - 300px);*/
+        }
+
     </style>
 </head>
 <body>
 
+<div class="editor-container container-fluid">
 
 
-<div>
-    HTML output:
-    <div id="pell-html-output" class="pell-html-output" style="white-space:pre-wrap;"></div>
+    <div id="previewer-title" class="row">
+        <div class="col-4">
+            HTML output:
+        </div>
+
+        <div class="col-4">
+            Markdown output:
+        </div>
+
+        <div class="col-4">
+            Text output:
+        </div>
+    </div>
+    <div class="row">
+        <div class="editor-previewer col-4">
+<!--            HTML output:-->
+            <div id="pell-html-output" class="pell-html-output" style="white-space:pre-wrap;"></div>
+        </div>
+
+        <div class="editor-previewer col-4">
+<!--            Markdown output:-->
+            <div id="pell-markdown-output" class="pell-html-output" style="white-space:pre-wrap;"></div>
+        </div>
+
+        <div class="editor-previewer col-4">
+<!--            Text output:-->
+            <div id="pell-text-output" class="pell-html-output" style="white-space:pre-wrap;"></div>
+        </div>
+
+    </div>
+
 </div>
 
-<div>
-    Markdown output:
-    <div id="pell-markdown-output" class="pell-html-output" style="white-space:pre-wrap;"></div>
+<div  class="container">
+    <div id="pell-editor" class="pell fixed-bottom"></div>
 </div>
-
-<div>
-    Text output:
-    <div id="pell-text-output" class="pell-html-output" style="white-space:pre-wrap;"></div>
-</div>
-
-
-
-
-<div id="pell-editor" class="pell"></div>
-
-
-
-
 
 
 
@@ -104,6 +134,17 @@
     // https://developer.mozilla.org/en/docs/Web/API/Document/execCommand
     // this is just `document.execCommand(command, false, value)`
     // pell.exec(command<string>, value<string>)
+
+    function resizePreviewer(){
+        $(".editor-previewer").css("height",function () {
+            let editorHeight=$("#pell-editor").height();
+            let titleHeight=$("#previewer-title").height();
+            console.log($(window).height() , editorHeight, titleHeight);
+            return $(window).height()-editorHeight-titleHeight;
+        })
+    }
+    $(window).onload=resizePreviewer();
+    $(window).resize=resizePreviewer();
 </script>
 </body>
 </html>

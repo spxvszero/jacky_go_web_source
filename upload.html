@@ -107,6 +107,8 @@
 
 <script type="text/javascript">
 
+    var uploadUrl = "http://localhost:8900/upload/interface";
+
     var dropZone = document.getElementById('drop-zone');
 
     //首先对页面事件做一个判断处理，如果页面中存在并满足下列if条件就触发事件方法。
@@ -688,7 +690,7 @@
 
     function sendUploadRequest(task) {
 
-        let url =  "http://localhost:8900/upload/interface";
+        let url =  uploadUrl;
         var xhr;
 
         let form = new FormData(); // FormData 对象

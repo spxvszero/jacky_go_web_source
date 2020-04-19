@@ -6,11 +6,11 @@
             return [ "name" ]
         }
         connect() {
-            console.log("begin")
+            //console.log("begin")
             this.backImageConnection()
             var that = this;
             window.onresize=function (size) {
-                console.log("resize?? ",size);
+                //console.log("resize?? ",size);
                 that.changeImg();
             }
 
@@ -217,15 +217,15 @@
             var blogDiv = document.querySelector('.blog-div')
 
             if (this.animsArr.length <= 0) {
-                console.log("begin");
+            //     console.log("begin");
             	var lab = document.querySelector('.lab-div')
             	var about = document.querySelector('.about-div')
 
             	this.beginFrameAnimation(blogDiv,[lab,about])
 
             } else {
-                console.log("reset");
-                console.log("anim log", this.blogAnimation)
+                // console.log("reset");
+                // console.log("anim log", this.blogAnimation)
                 this.resetAction()
             }
         }
@@ -291,7 +291,7 @@
         }
         beginFrameAnimation(clickEle, otherElement) {
 
-            console.log("cur animes -- ",anime.running);
+            //console.log("cur animes -- ",anime.running);
             if (this.animsArr.length > 0) return;
             if (this.titleAnimationComplete == false) return;
             this.titleAnimationComplete = false;
@@ -376,9 +376,9 @@
         }
 
         resetAction() {
-            console.log("animArr -- ",this.animsArr);
+            //console.log("animArr -- ",this.animsArr);
             if (this.titleAnimationComplete == false) {
-                console.log("anim reset ",this.titleAnimationComplete);
+                //console.log("anim reset ",this.titleAnimationComplete);
                 return;
             }
             this.titleAnimationComplete = false;
