@@ -8,6 +8,8 @@
     <script src="jsscript/popper.min.js"></script>
     <script src="jsscript/bootstrap.min.js"></script>
 
+    <script src="https://cdn.bootcss.com/markdown-it/10.0.0/markdown-it.js"></script>
+
     <title>Edit Page</title>
 
     <script src="jsscript/turndown.js"></script>
@@ -25,25 +27,47 @@
             overflow: scroll;
             /*height: calc(100vh - 300px);*/
         }
+        .seperator{
+            background-color: lightblue;
+            height: 100vh;
+            width: 2px;
+            margin-bottom: -100vh;
+            margin-left: -1px;
+            margin-right: -1px;
+        }
+
 
     </style>
 </head>
 <body>
 
+<div >
+    <div id="popover-content" class="dropdown-menu">
+        <a class="dropdown-item" href="#">Action</a>
+        <a class="dropdown-item" href="#">Another action</a>
+        <a class="dropdown-item" href="#">Something else here</a>
+    </div>
+</div>
+
+
 <div class="editor-container container-fluid">
 
 
-    <div id="previewer-title" class="row">
+    <div id="previewer-title" class="row font-weight-bold">
         <div class="col-4">
-            HTML output:
+            HTML
         </div>
 
-        <div class="col-4">
-            Markdown output:
-        </div>
+        <div class="seperator shadow"></div>
 
         <div class="col-4">
-            Text output:
+            Markdown
+        </div>
+
+        <div class="seperator shadow"></div>
+
+        <div class="col-4">
+            Text
         </div>
     </div>
     <div class="row">
@@ -54,7 +78,7 @@
 
         <div class="editor-previewer col-4">
 <!--            Markdown output:-->
-            <div id="pell-markdown-output" class="pell-html-output" style="white-space:pre-wrap;"></div>
+            <div id="pell-markdown-output" class="pell-html-output"></div>
         </div>
 
         <div class="editor-previewer col-4">
@@ -67,16 +91,45 @@
 </div>
 
 <div  class="container">
-    <div id="pell-editor" class="pell fixed-bottom"></div>
+    <div id="pell-editor" class="pell fixed-bottom">
+    </div>
 </div>
 
 
 
 
 <script src="jsscript/pell.min.js"></script>
+
 <script>
     //turndown markdown to html
+    TurndownService.prototype.escape=function (string) {
+        return string;
+    };
     var turndownService = new TurndownService()
+    var md = window.markdownit({
+        html:         false,        // Enable HTML tags in source
+        xhtmlOut:     false,        // Use '/' to close single tags (<br />).
+                                    // This is only for full CommonMark compatibility.
+        breaks:       false,        // Convert '\n' in paragraphs into <br>
+        langPrefix:   'language-',  // CSS language prefix for fenced blocks. Can be
+                                    // useful for external highlighters.
+        linkify:      false,        // Autoconvert URL-like text to links
+
+        // Enable some language-neutral replacement + quotes beautification
+        typographer:  false,
+
+        // Double + single quotes replacement pairs, when typographer enabled,
+        // and smartquotes on. Could be either a String or an Array.
+        //
+        // For example, you can use '«»„“' for Russian, '„“‚‘' for German,
+        // and ['«\xA0', '\xA0»', '‹\xA0', '\xA0›'] for French (including nbsp).
+        quotes: '“”‘’',
+
+        // Highlighter function. Should return escaped HTML,
+        // or '' if the source string is not changed and should be escaped externally.
+        // If result starts with <pre... internal wrapper is skipped.
+        highlight: function (/*str, lang*/) { return ''; }
+    });
 
     // Initialize pell on an HTMLElement
     pell.init({
@@ -90,8 +143,10 @@
             markdownDiv = document.getElementById('pell-markdown-output');
             textDiv = document.getElementById('pell-text-output');
 
+            console.log("html\n",html);
+            console.log("html.text\n",turndownService.turndown(html));
             htmlDiv.innerHTML = html;
-            markdownDiv.innerHTML = turndownService.turndown(html);
+            markdownDiv.innerHTML = md.render(turndownService.turndown(html));
             textDiv.innerText = html;
         },
 
@@ -101,7 +156,7 @@
 
         // <boolean>, optional, default = false
         // Outputs <span style="font-weight: bold;"></span> instead of <b></b>
-        styleWithCSS: false,
+        styleWithCSS: true,
 
         // <Array[string | Object]>, string if overwriting, object if customizing/creating
         // action.name<string> (only required if overwriting)
@@ -114,10 +169,23 @@
             {
                 name: 'custom',
                 icon: 'C',
-                title: 'Custom Action',
-                result: () => console.log('Do something!')
+                id:'test1',
+                result: ()=>{
+                    console.log("asdfsdf")
+                }
             },
-            'underline'
+            'underline',
+            'strikethrough',
+            'heading1',
+            'heading2',
+            'paragraph',
+            'quote',
+            'olist',
+            'ulist',
+            'code',
+            'line',
+            'link',
+            'image'
         ],
 
         // classes<Array[string]> (optional)
@@ -139,12 +207,23 @@
         $(".editor-previewer").css("height",function () {
             let editorHeight=$("#pell-editor").height();
             let titleHeight=$("#previewer-title").height();
-            console.log($(window).height() , editorHeight, titleHeight);
+
             return $(window).height()-editorHeight-titleHeight;
         })
     }
     $(window).onload=resizePreviewer();
     $(window).resize=resizePreviewer();
+
+    $("#test1").popover({
+        placement: 'bottom',
+        container: 'body',
+        html: true,
+        trigger: 'focus',
+        content: function () {
+            return $('#popover-content').html();
+        }
+    });
+
 </script>
 </body>
 </html>
