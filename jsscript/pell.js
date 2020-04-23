@@ -151,7 +151,12 @@ var defaultClasses = {
   selected: 'pell-button-selected'
 };
 
+var userSettings;
+
 var init = function init(settings) {
+
+  userSettings = settings;
+
   var actions = settings.actions ? settings.actions.map(function (action) {
     if (typeof action === 'string') return defaultActions[action];else if (defaultActions[action.name]) return _extends({}, defaultActions[action.name], action);
     return action;
@@ -161,6 +166,7 @@ var init = function init(settings) {
 
   var classes = _extends({}, defaultClasses, settings.classes);
 
+  console.log("ori- - ",classes);
   var defaultParagraphSeparator = settings[defaultParagraphSeparatorString] || 'div';
 
   var actionbar = createElement('div');
@@ -212,13 +218,59 @@ var init = function init(settings) {
   if (settings.styleWithCSS) exec('styleWithCSS');
   exec(defaultParagraphSeparatorString, defaultParagraphSeparator);
 
+
+  console.log("content --");
+  console.log(content);
   return settings.element;
 };
 
-var pell = { exec: exec, init: init };
+
+var addActionForButtonHandles = [];
+var addActionForButton = function addActionForButton(button,state,groupBtns,groupButtonState,result) {
+
+    var content = document.getElementsByClassName(userSettings?userSettings.classes.content:defaultClasses.content);
+
+    button.classList.add(userSettings?userSettings.classes.button:defaultClasses.button);
+
+    if (result){
+      button.onclick = function () {
+        console.log("focus -- ",content[0]);
+        return result() && content[0].focus();
+      };
+    }
+    var handler = function handler() {
+      console.log("query -- ",state());
+      if (groupBtns && groupButtonState){
+          groupBtns.forEach(function action(ele) {
+            ele.classList[groupButtonState(ele) ? 'add' : 'remove'](userSettings?userSettings.classes.selected:defaultClasses.selected);
+          });
+      }
+      return button.classList[state() ? 'add' : 'remove'](userSettings?userSettings.classes.selected:defaultClasses.selected);
+    };
+    addEventListener(content[0],'keyup', handler);
+    addEventListener(content[0],'mouseup', handler);
+    addEventListener(button,'click', handler);
+
+    addActionForButtonHandles.push({"btn":button,"handler":handler});
+}
+
+var removeActionForButton = function removeActionForButton(){
+  var content = document.getElementsByClassName(userSettings?userSettings.classes.content:defaultClasses.content);
+  addActionForButtonHandles.forEach(function removeHandle(dic) {
+      var handler = dic["handler"];
+      dic["btn"].removeEventListener('click',handler);
+      content[0].removeEventListener('mouseup', handler);
+      content[0].removeEventListener('keyup', handler);
+  });
+  addActionForButtonHandles = [];
+}
+
+var pell = { exec: exec, init: init ,addActionForButton:addActionForButton,removeActionForButton:removeActionForButton};
 
 exports.exec = exec;
 exports.init = init;
+exports.addActionForButton = addActionForButton;
+exports.removeActionForButton = removeActionForButton;
 exports['default'] = pell;
 
 Object.defineProperty(exports, '__esModule', { value: true });
