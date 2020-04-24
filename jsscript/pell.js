@@ -166,7 +166,6 @@ var init = function init(settings) {
 
   var classes = _extends({}, defaultClasses, settings.classes);
 
-  console.log("ori- - ",classes);
   var defaultParagraphSeparator = settings[defaultParagraphSeparatorString] || 'div';
 
   var actionbar = createElement('div');
@@ -218,9 +217,6 @@ var init = function init(settings) {
   if (settings.styleWithCSS) exec('styleWithCSS');
   exec(defaultParagraphSeparatorString, defaultParagraphSeparator);
 
-
-  console.log("content --");
-  console.log(content);
   return settings.element;
 };
 
@@ -234,12 +230,10 @@ var addActionForButton = function addActionForButton(button,state,groupBtns,grou
 
     if (result){
       button.onclick = function () {
-        console.log("focus -- ",content[0]);
         return result() && content[0].focus();
       };
     }
     var handler = function handler() {
-      console.log("query -- ",state());
       if (groupBtns && groupButtonState){
           groupBtns.forEach(function action(ele) {
             ele.classList[groupButtonState(ele) ? 'add' : 'remove'](userSettings?userSettings.classes.selected:defaultClasses.selected);

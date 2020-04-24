@@ -234,9 +234,7 @@
                     </div>\
                     "
     }).on('shown.bs.popover',function () {
-        console.log("popover show");
         $(".color-block").each(function (i,ele) {
-            console.log("add element -- ",i,ele);
             pell.addActionForButton(ele,function state() {
                 let isMe = (curColorValue==ele.style.getPropertyValue("background-color"));
                 return isMe;
