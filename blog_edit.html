@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="jsscript/pell.min.css">
     <link rel="stylesheet" href="jsscript/bootstrap.min.css">
-    <script src="jsscript/jquery-3.4.1.slim.min.js"></script>
+    <!-- <script src="jsscript/jquery-3.4.1.slim.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
     <script src="jsscript/popper.min.js"></script>
     <script src="jsscript/bootstrap.min.js"></script>
 
@@ -45,6 +46,44 @@
             border: deepskyblue;
             border-width: 2px;
             border-style: solid;
+        }
+
+        .image-container{
+            height: 100%;
+            width: 20%;
+            background: gray;
+            left: 96%;
+            position: absolute;
+            transition: all 0.35s;
+        }
+
+        .image-bar{
+            height: inherit;
+            width: 5%;
+            background: lime;
+            position: absolute;
+        }
+
+        .image-container.img-anim{
+            left: 80%;
+        }
+
+        .image-list{
+            overflow-y: scroll;
+            width: 95%;
+            left: 5%;
+            position: absolute;
+            height: 100%;
+            overflow-y: scroll;
+        }
+
+        .image-list-item {
+            padding: 10px;
+            width: 100%;
+        }
+
+        .image-list-item:hover{
+
         }
 
 
@@ -187,7 +226,26 @@
             'code',
             'line',
             'link',
-            'image'
+            'image',
+            {
+                name:'build',
+                icon: 'TT',
+                result: function result() {
+                    var url = window.prompt('Enter the image URL');
+                    buildImage();
+                    if (url) {
+                        pell.exec('insertImage', url);
+                        addImageWithUrl(url);
+                    }
+                }
+            },
+            {
+                name:'add',
+                icon: 'Add',
+                result: ()=>{
+                    addImageWithUrl();
+                }
+            }
         ],
 
         // classes<Array[string]> (optional)
@@ -205,6 +263,7 @@
     // this is just `document.execCommand(command, false, value)`
     // pell.exec(command<string>, value<string>)
 
+    //Init : seperator Line
     function resizePreviewer(){
         $(".editor-previewer").css("height",function () {
             let editorHeight=$("#pell-editor").height();
@@ -216,6 +275,8 @@
     $(window).onload=resizePreviewer();
     $(window).resize=resizePreviewer();
 
+
+    //Init : color panel
     var curColorValue="rgb(0, 0, 0)";
     $("#test1").popover({
         placement: 'top',
@@ -249,6 +310,52 @@
         pell.removeActionForButton();
     });
 
+    var i = 1;
+    function buildImage() {
+        if ($('.image-container').length <= 0){
+            let leftPanel = $('<div>',{
+                id:"image-home",
+                class:"image-container"
+            });
+            $("#pell-editor").prepend(leftPanel);
+            leftPanel.append($('<div>',{
+                class:"image-bar",
+                type:"button",
+                onclick:"imageSlideAction()"
+            }));
+            leftPanel.append($('<div>',{
+                class:"image-list"
+            }));
+        }
+    }
+
+    function imageSlideAction() {
+
+        if($('.image-container').hasClass('img-anim')){
+            $('.image-container').removeClass('img-anim')
+        }else{
+            $('.image-container').addClass('img-anim')
+        }
+    }
+
+    function addImageWithUrl(add_url) {
+        if (add_url.length <= 0) return;
+
+        let img = $("<img>",{
+            class:"image-list-item",
+            src:add_url
+        });
+
+        $(img).click(function (ev) {
+            return clickOnImage(ev);
+        });
+
+        $('.image-list').append(img);
+    }
+
+    function clickOnImage(event) {
+        console.log("click on iamge ",this,event);
+    }
 
 </script>
 </body>
