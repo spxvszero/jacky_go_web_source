@@ -25,7 +25,6 @@
 </div>
 
 
-
 </body>
 
 <script>
@@ -38,6 +37,7 @@
 
     let downloadJsonUrl = "http://localhost:8900/download/json";
     let sharedUrl = "http://localhost:8900/shared";
+    let removeUrl = "http://localhost:8900/files/remove";
 
     var curPopoverObj;
 
@@ -50,15 +50,18 @@
         var xhttp;
         xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                jsonObj = JSON.parse(this.responseText);
-                deepObjArr = jsonObj;
-                deepIdx = 0;
+            if (this.readyState == 4) {
+                if (this.status == 200){
+                    jsonObj = JSON.parse(this.responseText);
+                    deepObjArr = jsonObj;
+                    deepIdx = 0;
 
-                jkconsole(jsonObj);
+                    jkconsole(jsonObj);
 
-                tableEnter();
-
+                    tableEnter();
+                }else {
+                    showFailed(this.responseText);
+                }
             }
         };
         xhttp.open("GET", downloadJsonUrl, true);
@@ -241,6 +244,28 @@
             };
         }(sharedBtn,obj);
         td.appendChild(sharedBtn);
+
+        var removeBtn = createOpBtn();
+        removeBtn.classList.replace("btn-primary","btn-danger");
+        removeBtn.innerHTML = "\n" +
+            "<svg width=\"16px\" height=\"16px\" viewBox=\"0 0 16 16\" version=\"1.1\">\n" +
+            "    <desc>Created with Sketch.</desc>\n" +
+            "    <defs></defs>\n" +
+            "    <g id=\"Page-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n" +
+            "        <g id=\"remove\" transform=\"translate(-2.000000, -2.000000)\" fill=\"#FFFFFF\" stroke=\"#FFFFFF\">\n" +
+            "            <g id=\"Group\" transform=\"translate(2.914919, 1.942580)\">\n" +
+            "                <path d=\"M0.188205901,1.70882278 C0.72453821,2.25666095 12.6982595,14.1316142 13.2137446,14.6284165 C13.7292297,15.1252188 14.4832429,14.3248751 14.022553,13.8556413 C13.5618632,13.3864075 1.42150771,1.34491638 0.956374992,0.894365339 C0.491242278,0.443814303 -0.348126408,1.16098462 0.188205901,1.70882278 Z\" id=\"Path-2\"></path>\n" +
+            "                <path d=\"M0.188205901,1.70882278 C0.72453821,2.25666095 12.6982595,14.1316142 13.2137446,14.6284165 C13.7292297,15.1252188 14.4832429,14.3248751 14.022553,13.8556413 C13.5618632,13.3864075 1.42150771,1.34491638 0.956374992,0.894365339 C0.491242278,0.443814303 -0.348126408,1.16098462 0.188205901,1.70882278 Z\" id=\"Path-copy\" transform=\"translate(7.090437, 7.768817) scale(1, -1) translate(-7.090437, -7.768817) \"></path>\n" +
+            "            </g>\n" +
+            "        </g>\n" +
+            "    </g>\n" +
+            "</svg>";
+        removeBtn.onclick = function (caller,obj) {
+            return function () {
+                removeAction(caller,obj);
+            };
+        }(removeBtn,obj);
+        td.appendChild(removeBtn);
     }
 
     function createOpBtn(btnId) {
@@ -335,6 +360,42 @@
 
     }
 
+    function removeAction(caller,obj) {
+        event.cancelBubble = true;
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4) {
+                var title = "";
+                var content = "";
+                if (this.status == 200) {
+                    caller.parentElement.parentElement.parentElement.removeChild(caller.parentElement.parentElement);
+                    removeObj(obj)
+                }else{
+                    showFailed(this.responseText);
+                }
+            }
+        };
+
+        var path = "";
+
+        if (obj["DirPath"] && obj["DirPath"].length > 0){
+            path = obj["DirPath"] + '/' + obj["Name"];
+        } else{
+            path = obj["Name"];
+        }
+
+        var url = removeUrl;
+
+        xhttp.open("POST", url , true);
+        var data;
+        data = new FormData();
+        data.append("filePath", path);
+        data.append("isDir", obj["IsDir"]);
+
+        xhttp.withCredentials=true;
+        xhttp.send();
+    }
 
     function goDeep(row) {
 
@@ -350,6 +411,12 @@
 
         reloadTable()
 
+    }
+
+    function removeObj(obj) {
+        //remove data
+        var objIndex = deepObjArr.indexOf(obj);
+        if(!isNaN(objIndex)) deepObjArr.splice(objIndex,1);
     }
 
     function reloadTable() {
@@ -389,7 +456,7 @@
     }
 
     function jkconsole(...args) {
-        // console.log(args)
+        console.log(args)
     }
 
     function clearPopover(objCaller) {
@@ -401,6 +468,68 @@
             if (sameObj) return true;
         }
         return false;
+    }
+
+
+    const showToastAnime = `
+        @keyframes toastAppear
+        {
+            from {opacity:0%;}
+            to {opacity:100%;}
+        }
+        @-moz-keyframes toastAppear
+        {
+            from {opacity:0%;}
+            to {opacity:100%;}
+        }
+        @-webkit-keyframes toastAppear
+        {
+            from {opacity:0%;}
+            to {opacity:100%;}
+        }
+        @-o-keyframes toastAppear
+        {
+            from {opacity:0%;}
+            to {opacity:100%;}
+        }
+    `;
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.innerHTML = showToastAnime;
+    document.getElementsByTagName('head')[0].appendChild(style);
+
+    function showFailed(msg) {
+        var dismissTime = 3000;
+
+        var dialog = document.createElement("div")
+        dialog.innerHTML = "" +
+            "<div style=\"" +
+            "position: fixed;" +
+            "z-index: 9998;" +
+            "width: 100%;" +
+            "height: 100%;" +
+            "top: 0;" +
+            "left: 0;" +
+            "background-color: #0000;" +
+            "text-align: center;" +
+            "animation: toastAppear 0.5s ease-out;" +
+            "pointer-events: none;\">" +
+            "<btn style=\"" +
+            "position: relative;" +
+            "top: 80%;" +
+            "padding: 10px;" +
+            "border-radius: 5px;" +
+            "width: 50%;" +
+            "pointer-events: none;" +
+            "max-width: 300px;\" " +
+            "class=\"btn-danger\">"+ msg + "</btn>" +
+            "</div>";
+
+        document.body.appendChild(dialog);
+
+        setTimeout(function () {
+            document.body.removeChild(dialog);
+        },dismissTime);
     }
 
 </script>
