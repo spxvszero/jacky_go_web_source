@@ -10,8 +10,17 @@
 </head>
 <body onload="getDownloadDir()">
 
-<button class="btn-danger" style="margin-top: 10px; margin-bottom: 10px;margin-left: 10px;"  type="button" onclick="getDownloadDir()">刷新</button>
-<button class="btn-primary" style="margin-top: 10px; margin-bottom: 10px;margin-left: 10px;"  type="button" onclick="backToTopDir()">返回最上级</button>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4">
+            <button class="btn-danger" style="margin-top: 10px; margin-bottom: 10px;margin-left: 5px;margin-right: 5px; height: 30px"  type="button" onclick="getDownloadDir()">刷新</button>
+            <button class="btn-primary" style="margin-top: 10px; margin-bottom: 10px;margin-left: 5px;margin-right: 5px; height: 30px"  type="button" onclick="backToTopDir()">返回最上级</button>
+        </div>
+        <div class="col" ></div>
+<!--        <div class="col-2" style="background-color: blue" contenteditable="true"></div>-->
+        <input id="search-input" placeholder="Search" class="form-control col-sm-2" style="margin-top: 10px; margin-bottom: 10px;margin-left: 5px;margin-right: 5px;">
+    </div>
+</div>
 
 <div id="table-show">
     <table class="table table-bordered table-hover" id="example-table">
@@ -471,6 +480,66 @@
     }
 
 
+    //input search style
+    const searchStyle = `
+        ::-webkit-input-placeholder {
+            font-style: italic;
+        }
+        ::-moz-placeholder { font-style: italic; } /* firefox 19+ */
+        :-ms-input-placeholder {font-style: italic;} /* Internet Explorer 10+ */
+        :-moz-placeholder { font-style: italic; } /* firefox 14-18 */
+    `;
+    const addStyle = document.createElement('style');
+    addStyle.type = 'text/css';
+    addStyle.innerHTML = searchStyle;
+    document.getElementsByTagName('head')[0].appendChild(addStyle);
+
+    //input function
+    var inputElement = document.getElementById("search-input")
+    inputElement.addEventListener('input', searchInputChange);
+    function searchInputChange(evt) {
+        console.log("input evt ",evt);
+        //query list
+        var inputStr = evt.target.value;
+
+        if (inputStr.length <= 0){
+            backToTopDir();
+            return;
+        }
+
+        deepIdx = 0;
+        deepIdxArr=[];
+        deepObjArr = getArrayFromText(inputStr)
+        reloadTable()
+
+    };
+
+    function getArrayFromText(txt) {
+        var obj = jsonObj;
+
+        var resultObj = new Array();
+
+        recursiveGetObjWithTxt(obj,txt,function (dic) {
+            resultObj.push(dic);
+        });
+
+        return resultObj;
+    }
+
+    function recursiveGetObjWithTxt(inputObj,searchTxt,handle) {
+        for (i=0;i<inputObj.length;i++){
+            var tmpDic = inputObj[i];
+            if (tmpDic["Name"].search(new RegExp(searchTxt,"i")) != -1){
+                handle(tmpDic);
+            }
+            if (tmpDic["SubFiles"] != null && tmpDic["SubFiles"].length > 0){
+                recursiveGetObjWithTxt(tmpDic["SubFiles"],searchTxt,handle);
+            }
+        }
+    }
+
+
+    //toast function
     const showToastAnime = `
         @keyframes toastAppear
         {
