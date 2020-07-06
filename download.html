@@ -17,20 +17,26 @@
             <button class="btn-primary" style="margin-top: 10px; margin-bottom: 10px;margin-left: 5px;margin-right: 5px; height: 30px"  type="button" onclick="backToTopDir()">返回最上级</button>
         </div>
         <div class="col" ></div>
-<!--        <div class="col-2" style="background-color: blue" contenteditable="true"></div>-->
-        <input id="search-input" placeholder="Search" class="form-control col-sm-2" style="margin-top: 10px; margin-bottom: 10px;margin-left: 5px;margin-right: 5px;">
+        <input id="search-input" placeholder="Search" class="form-control col-sm-2" style="margin-top: 10px; margin-bottom: 10px;margin-left: 15px;margin-right: 15px;">
     </div>
 </div>
 
-<div id="table-show">
-    <table class="table table-bordered table-hover" id="example-table">
-        <thead>
-        <tr><th>名称</th><th>大小</th><th>更新时间</th><th>操作</th></tr>
-        </thead>
-        <tbody id="table-body"></tbody>
+<div class="container-fluid">
+    <div id="table-show" style="table-layout: fixed;word-break: break-all;">
+        <table class="table table-bordered table-hover" id="example-table">
+            <thead>
+            <tr>
+                <th style="width: 30%;">名称</th>
+                <th style="width: 10%;">大小</th>
+                <th style="width: 20%;">更新时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
 
-    </table>
+        </table>
 
+    </div>
 </div>
 
 
