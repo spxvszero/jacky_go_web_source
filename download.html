@@ -13,8 +13,13 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-4">
-            <button class="btn-danger" style="margin-top: 10px; margin-bottom: 10px;margin-left: 5px;margin-right: 5px; height: 30px"  type="button" onclick="getDownloadDir()">刷新</button>
-            <button class="btn-primary" style="margin-top: 10px; margin-bottom: 10px;margin-left: 5px;margin-right: 5px; height: 30px"  type="button" onclick="backToTopDir()">返回最上级</button>
+            <div style="margin-top: 10px; margin-bottom: 10px;margin-left: 5px;margin-right: 5px; height: 30px;width: auto;display: inline-block;">
+                <button class="btn btn-outline-primary" style="height: 100%;padding-top: 0px;padding-bottom: 0px;" type="button" onclick="getDownloadDir()">刷新</button>
+            </div>
+            <div style="margin-top: 10px; margin-bottom: 10px;margin-left: 5px;margin-right: 5px; height: 30px;width: auto;display: inline-block;">
+                <button class="btn btn-outline-primary" style="height: 100%;padding-top: 0px;padding-bottom: 0px;"  type="button" onclick="backToTopDir()">返回最上级</button>
+            </div>
+
         </div>
         <div class="col" ></div>
         <input id="search-input" placeholder="Search" class="form-control col-sm-2" style="margin-top: 10px; margin-bottom: 10px;margin-left: 15px;margin-right: 15px;">
@@ -24,7 +29,7 @@
 <div class="container-fluid">
     <div id="table-show" style="table-layout: fixed;word-break: break-all;">
         <table class="table table-bordered table-hover" id="example-table">
-            <thead>
+            <thead class="thead-dark">
             <tr>
                 <th style="width: 30%;">名称</th>
                 <th style="width: 10%;">大小</th>
@@ -95,81 +100,115 @@
                     goBackDeep();
                 };
             }();
-            table.appendChild(tr)
+            tr.classList.add("table-secondary");
+            table.appendChild(tr);
 
-            var nameth = document.createElement("td")
-            nameth.innerText = ".."
-            tr.appendChild(nameth)
+            var nameth = document.createElement("td");
+            nameth.innerText = "..";
+            tr.appendChild(nameth);
 
-            var sizeth = document.createElement("td")
-            tr.appendChild(sizeth)
+            var sizeth = document.createElement("td");
+            tr.appendChild(sizeth);
 
-            var updateth = document.createElement("td")
-            tr.appendChild(updateth)
+            var updateth = document.createElement("td");
+            tr.appendChild(updateth);
 
-            var opth = document.createElement("td")
-            tr.appendChild(opth)
+            var opth = document.createElement("td");
+            tr.appendChild(opth);
         }
 
         if (deepObjArr == null){return}
 
-        var length = deepObjArr.length
-        var arr = deepObjArr
+        var length = deepObjArr.length;
+        var arr = deepObjArr;
 
         for (i =0;i<length;i++) {
-            var tr = document.createElement("tr")
-            tr.onclick = function (idx) {
-                return function () {
-                    goDeep(idx);
-                };
-            }(i);
-            table.appendChild(tr)
-
-            var nameth = document.createElement("td")
-            if (arr[i]["IsDir"]){
-                nameth.innerHTML = "<svg width=\"23px\" height=\"19px\" viewBox=\"0 0 23 19\" >\n" +
-                    "    <desc>Created with Sketch.</desc>\n" +
-                    "    <defs></defs>\n" +
-                    "    <g id=\"Page-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n" +
-                    "        <g id=\"folder_opened\" transform=\"translate(0.751381, 0.652311)\" fill=\"#000000\" fill-rule=\"nonzero\">\n" +
-                    "            <path d=\"M20,5 C21.1045695,5 22,5.8954305 22,7 L21.9761871,7.2169305 L19.9959782,16.1278704 C19.9300429,17.1728563 19.0616163,18 18,18 L2,18 C0.8954305,18 0,17.1045695 0,16 L0,2 C0,0.8954305 0.8954305,0 2,0 L8,0 C9.1200023,0 9.832939,0.47545118 10.5489764,1.37885309 C10.5967547,1.43913352 10.8100999,1.71588275 10.8624831,1.78081945 C11.019726,1.97574495 11.0517795,1.99972956 11.0017863,2 L18,2 C19.1045695,2 20,2.8954305 20,4 L20,5 Z M18,5 L18,4 L10.994646,3.99998567 C10.2764915,3.99614058 9.8086916,3.65990923 9.3058322,3.03654146 C9.2364281,2.95050497 9.0158737,2.66440398 8.98159778,2.62115916 C8.60702158,2.14856811 8.38424442,2 8,2 L2,2 L2,6.89145869 L2.02912707,6.76040502 C2.31020006,5.62145726 2.83339587,5 4,5 L18,5 Z M2.02439383,16 L18,16 L18.0238129,15.7830695 L19.9756062,7 L4.03630578,7 C4.02068072,7.0495501 3.99991917,7.1212947 3.97618706,7.2169305 L2.02439383,16 Z\" id=\"Shape\"></path>\n" +
-                    "        </g>\n" +
-                    "    </g>\n" +
-                    "</svg>" + " " + arr[i]["Name"]
-            }else {
-                nameth.innerHTML = "<svg width=\"18px\" height=\"22px\" viewBox=\"0 0 18 22\">\n" +
-                    "            <desc>Created with Sketch.</desc>\n" +
-                    "                <defs></defs>\n" +
-                    "                <g id=\"Page-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n" +
-                    "                    <g id=\"file_text\" fill=\"#000000\" fill-rule=\"nonzero\">\n" +
-                    "                    <path d=\"M12,2.41421356 L12,6 L15.5857864,6 L12,2.41421356 Z M16,8 L12,8 C10.8954305,8 10,7.1045695 10,6 L10,2 L2,2 L2,20 L16,20 L16,8 Z M2,0 L12.4142136,0 L18,5.58578644 L18,20 C18,21.1045695 17.1045695,22 16,22 L2,22 C0.8954305,22 0,21.1045695 0,20 L0,2 C0,0.8954305 0.8954305,0 2,0 Z M5,16 L5,14 L11,14 L11,16 L5,16 Z M5,12 L5,10 L13,10 L13,12 L5,12 Z\" id=\"Shape\"></path>\n" +
-                    "                    </g>\n" +
-                    "                    </g>\n" +
-                    "                    </svg>" + " " + arr[i]["Name"]
-            }
-            // nameth.innerText = nameth.innerText
-            tr.appendChild(nameth)
-
-            var sizeth = document.createElement("td")
-            if (arr[i]["IsDir"]){
-                sizeth.innerText="-";
-            } else{
-                sizeth.innerText= formatFileSize(arr[i]["Size"],2);
-            }
-            tr.appendChild(sizeth);
-
-            var updateth = document.createElement("td")
-            var time = arr[i]["ModTime"];
-            var unixTimestamp = new Date(time*1000);
-            var commonTime = unixTimestamp.toLocaleString('chinese', { hour12: false });
-            updateth.innerText=commonTime
-            tr.appendChild(updateth)
-
-            var opth = document.createElement("td")
-            createOp(opth,arr[i])
-            tr.appendChild(opth)
+            createTableRowWithObj(arr[i],table,null);
         }
 
+    }
+
+    function createTableRowWithObj(obj,table,linkElementId) {
+        var tr = document.createElement("tr");
+
+        var namePadding = "";
+        if (linkElementId != null){
+            //tr onclick event
+            tr.onclick = function (caller,linkObj) {
+                return function () {
+                    goDeep(caller,linkObj);
+                };
+            }(tr,obj);
+
+            //tr attr
+            tr.setAttribute("linkElementId", linkElementId);
+
+            //find relation with pre tr element
+            if (table.children.length > 0){
+                var preTr = table.children[table.children.length - 1];
+                var preElementId = preTr.getAttribute("linkElementId");
+                var relation = getSamePrefixStringFromTwoStrings(preElementId.split("-").join(''),linkElementId.split("-").join(''));
+
+                if (preElementId.length < linkElementId.length && relation != null && relation.length > 0){
+                    namePadding += '|'
+                    namePadding += '-'.repeat(relation.length);
+                }
+            }
+        }else{
+            tr.onclick = function (caller,idx) {
+                return function () {
+                    goDeep(caller,idx);
+                };
+            }(tr,i);
+        }
+
+        table.appendChild(tr);
+
+        var nameth = document.createElement("td");
+        if (obj["IsDir"]){
+            nameth.innerHTML = namePadding +
+                "<svg width=\"23px\" height=\"19px\" viewBox=\"0 0 23 19\" >\n" +
+                "    <desc>Created with Sketch.</desc>\n" +
+                "    <defs></defs>\n" +
+                "    <g id=\"Page-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n" +
+                "        <g id=\"folder_opened\" transform=\"translate(0.751381, 0.652311)\" fill=\"#000000\" fill-rule=\"nonzero\">\n" +
+                "            <path d=\"M20,5 C21.1045695,5 22,5.8954305 22,7 L21.9761871,7.2169305 L19.9959782,16.1278704 C19.9300429,17.1728563 19.0616163,18 18,18 L2,18 C0.8954305,18 0,17.1045695 0,16 L0,2 C0,0.8954305 0.8954305,0 2,0 L8,0 C9.1200023,0 9.832939,0.47545118 10.5489764,1.37885309 C10.5967547,1.43913352 10.8100999,1.71588275 10.8624831,1.78081945 C11.019726,1.97574495 11.0517795,1.99972956 11.0017863,2 L18,2 C19.1045695,2 20,2.8954305 20,4 L20,5 Z M18,5 L18,4 L10.994646,3.99998567 C10.2764915,3.99614058 9.8086916,3.65990923 9.3058322,3.03654146 C9.2364281,2.95050497 9.0158737,2.66440398 8.98159778,2.62115916 C8.60702158,2.14856811 8.38424442,2 8,2 L2,2 L2,6.89145869 L2.02912707,6.76040502 C2.31020006,5.62145726 2.83339587,5 4,5 L18,5 Z M2.02439383,16 L18,16 L18.0238129,15.7830695 L19.9756062,7 L4.03630578,7 C4.02068072,7.0495501 3.99991917,7.1212947 3.97618706,7.2169305 L2.02439383,16 Z\" id=\"Shape\"></path>\n" +
+                "        </g>\n" +
+                "    </g>\n" +
+                "</svg>" + " " + obj["Name"]
+        }else {
+            nameth.innerHTML = namePadding +
+                "<svg width=\"18px\" height=\"22px\" viewBox=\"0 0 18 22\">\n" +
+                "            <desc>Created with Sketch.</desc>\n" +
+                "                <defs></defs>\n" +
+                "                <g id=\"Page-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n" +
+                "                    <g id=\"file_text\" fill=\"#000000\" fill-rule=\"nonzero\">\n" +
+                "                    <path d=\"M12,2.41421356 L12,6 L15.5857864,6 L12,2.41421356 Z M16,8 L12,8 C10.8954305,8 10,7.1045695 10,6 L10,2 L2,2 L2,20 L16,20 L16,8 Z M2,0 L12.4142136,0 L18,5.58578644 L18,20 C18,21.1045695 17.1045695,22 16,22 L2,22 C0.8954305,22 0,21.1045695 0,20 L0,2 C0,0.8954305 0.8954305,0 2,0 Z M5,16 L5,14 L11,14 L11,16 L5,16 Z M5,12 L5,10 L13,10 L13,12 L5,12 Z\" id=\"Shape\"></path>\n" +
+                "                    </g>\n" +
+                "                    </g>\n" +
+                "                    </svg>" + " " + obj["Name"]
+        }
+        // nameth.innerText = nameth.innerText
+        tr.appendChild(nameth)
+
+        var sizeth = document.createElement("td")
+        if (obj["IsDir"]){
+            sizeth.innerText="-";
+        } else{
+            sizeth.innerText= formatFileSize(obj["Size"],2);
+        }
+        tr.appendChild(sizeth);
+
+        var updateth = document.createElement("td")
+        var time = obj["ModTime"];
+        var unixTimestamp = new Date(time*1000);
+        var commonTime = unixTimestamp.toLocaleString('chinese', { hour12: false });
+        updateth.innerText=commonTime
+        tr.appendChild(updateth)
+
+        var opth = document.createElement("td")
+        createOp(opth,obj)
+        tr.appendChild(opth)
     }
 
     function formatFileSize(size,number) {
@@ -378,14 +417,19 @@
     function removeAction(caller,obj) {
         event.cancelBubble = true;
 
+        if (removeUrl.length <= 0 || removeUrl==null) {
+            showFailed("Unsupported Feature");
+            return;
+        }
+
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4) {
                 var title = "";
                 var content = "";
                 if (this.status == 200) {
-                    caller.parentElement.parentElement.parentElement.removeChild(caller.parentElement.parentElement);
-                    removeObj(obj)
+                    removeObj(obj,caller);
+                    removeElementWithObj(caller);
                 }else{
                     showFailed(this.responseText);
                 }
@@ -409,18 +453,31 @@
         data.append("isDir", obj["IsDir"]);
 
         xhttp.withCredentials=true;
-        xhttp.send();
+        xhttp.send(data);
     }
 
-    function goDeep(row) {
+    function goDeep(caller,rowOrObj) {
 
-        if (!deepObjArr[row]["IsDir"]){
-          return
+        var linkElementId = caller.getAttribute("linkElementId");
+        if (linkElementId != null){
+            if (!rowOrObj["IsDir"]){
+                return
+            }
+            var idxArr = linkElementId.split('-');
+            deepIdx = idxArr.length;
+            deepIdxArr = idxArr;
+            deepObjArr = rowOrObj["SubFiles"];
+
+        }else{
+            if (!deepObjArr[rowOrObj]["IsDir"]){
+                return
+            }
+            deepIdx ++;
+            deepIdxArr.push(rowOrObj);
+            deepObjArr = deepObjArr[rowOrObj]["SubFiles"];
         }
 
-        deepIdx ++;
-        deepIdxArr.push(row);
-        deepObjArr = deepObjArr[row]["SubFiles"];
+
 
         jkconsole("deepindex -- ",deepIdx," deepidxArr -- ",deepIdxArr," deepObj -- ",deepObjArr);
 
@@ -428,10 +485,55 @@
 
     }
 
-    function removeObj(obj) {
-        //remove data
-        var objIndex = deepObjArr.indexOf(obj);
-        if(!isNaN(objIndex)) deepObjArr.splice(objIndex,1);
+    function getTrElement(caller) {
+        //get tr element
+        var el = caller;
+        do {
+            if (el.tagName && el.tagName.toLowerCase() == "tr") {
+                break;
+            }
+            el = el.parentElement;
+        } while (el != null && el.parentElement != null);
+        return el;
+    }
+
+    function removeElementWithObj(caller) {
+        //get tr element
+        var el = getTrElement(caller);
+
+        //get relative element Id
+        var relativeElementId = el.getAttribute("linkElementId");
+        if (relativeElementId != null){
+            var collections = el.parentElement.children;
+            for (var i = collections.length - 1;i >= 0; i--) {
+                var elementId = collections[i].getAttribute("linkElementId");
+                if (elementId != null && elementId.startsWith(relativeElementId)){
+                    el.parentElement.removeChild(collections[i]);
+                }
+            }
+        }else{
+            //remove called tr element
+            el.parentElement.removeChild(el);
+        }
+    }
+    function removeObj(obj,btnCaller) {
+
+        var linkElementId = getTrElement(btnCaller).getAttribute("linkElementId");
+        if (linkElementId != null){
+            var idxArr = linkElementId.split('-');
+            var lastIdx = idxArr[idxArr.length - 1];
+            var removeObj = jsonObj;
+            for (var i = 0; i < idxArr.length - 1; i++){
+                var objIdx = idxArr[i];
+                var tmpObj = removeObj[parseInt(objIdx)];
+                removeObj = tmpObj["SubFiles"];
+            }
+            removeObj.splice(lastIdx,1);
+        }else{
+            //remove data
+            var objIndex = deepObjArr.indexOf(obj);
+            if(!isNaN(objIndex)) deepObjArr.splice(objIndex,1);
+        }
     }
 
     function reloadTable() {
@@ -471,7 +573,7 @@
     }
 
     function jkconsole(...args) {
-        console.log(args)
+        // console.log(args)
     }
 
     function clearPopover(objCaller) {
@@ -500,11 +602,11 @@
     addStyle.innerHTML = searchStyle;
     document.getElementsByTagName('head')[0].appendChild(addStyle);
 
-    //input function
+    //input search function
     var inputElement = document.getElementById("search-input")
     inputElement.addEventListener('input', searchInputChange);
     function searchInputChange(evt) {
-        console.log("input evt ",evt);
+
         //query list
         var inputStr = evt.target.value;
 
@@ -513,35 +615,55 @@
             return;
         }
 
-        deepIdx = 0;
-        deepIdxArr=[];
-        deepObjArr = getArrayFromText(inputStr)
-        reloadTable()
-
+        var table = document.getElementById("table-body");
+        table.innerHTML="";
+        clearPopover();
+        filterArrayFromText(inputStr,table)
     };
 
-    function getArrayFromText(txt) {
+    function filterArrayFromText(txt,table) {
         var obj = jsonObj;
 
-        var resultObj = new Array();
-
-        recursiveGetObjWithTxt(obj,txt,function (dic) {
-            resultObj.push(dic);
+        recursiveGetObjWithTxt(obj,null,txt,function (dic,elementId) {
+            createTableRowWithObj(dic,table,elementId);
         });
-
-        return resultObj;
     }
 
-    function recursiveGetObjWithTxt(inputObj,searchTxt,handle) {
-        for (i=0;i<inputObj.length;i++){
+    function recursiveGetObjWithTxt(inputObj,linkElementId,searchTxt,handle) {
+        for (var i=0;i<inputObj.length;i++){
+            var curId = i;
             var tmpDic = inputObj[i];
             if (tmpDic["Name"].search(new RegExp(searchTxt,"i")) != -1){
-                handle(tmpDic);
+                handle(tmpDic,bindLinkElementId(linkElementId,curId));
             }
             if (tmpDic["SubFiles"] != null && tmpDic["SubFiles"].length > 0){
-                recursiveGetObjWithTxt(tmpDic["SubFiles"],searchTxt,handle);
+                recursiveGetObjWithTxt(tmpDic["SubFiles"],bindLinkElementId(linkElementId,curId),searchTxt,handle);
             }
         }
+    }
+
+    function bindLinkElementId(originId,curId) {
+        if (originId != null) {
+            return originId + "-" + curId
+        }else {
+            return curId.toString()
+        }
+    }
+
+    function getSamePrefixStringFromTwoStrings(firstString,secondString) {
+        var length = Math.min(firstString.length,secondString.length);
+
+        var findIndex = length - 1;
+        for (var i = 0; i < length; i++){
+            if (firstString[i] != secondString[i]){
+                findIndex = i - 1;
+                break;
+            }
+        }
+
+        if (findIndex<0)return null
+
+        return firstString.slice(0,findIndex + 1)
     }
 
 
