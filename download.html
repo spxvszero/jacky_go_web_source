@@ -22,6 +22,9 @@
 
         </div>
         <div class="col" ></div>
+        <div class="col-sm-1" style="display: contents">
+            <button class="btn btn-primary" style="margin-top: 10px;margin-bottom: 10px;" data-toggle="modal" data-target="#modalDownload">+</button>
+        </div>
         <input id="search-input" placeholder="Search" class="form-control col-sm-2" style="margin-top: 10px; margin-bottom: 10px;margin-left: 15px;margin-right: 15px;">
     </div>
 </div>
@@ -31,9 +34,9 @@
         <table class="table table-bordered table-hover" id="example-table">
             <thead class="thead-dark">
             <tr>
-                <th style="width: 30%;">名称</th>
-                <th style="width: 10%;">大小</th>
-                <th style="width: 20%;">更新时间</th>
+                <th style="width: 30%;" onclick="sortClickName()">名称<p id="sortIcon1" style="display: contents;"></p></th>
+                <th style="width: 10%;" onclick="sortClickSize()">大小<p id="sortIcon2" style="display: contents;"></p></th>
+                <th style="width: 20%;" onclick="sortClickTime()">更新时间<p id="sortIcon3" style="display: contents;"></p></th>
                 <th>操作</th>
             </tr>
             </thead>
@@ -44,6 +47,35 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="modalDownload" tabindex="-1" role="dialog" aria-labelledby="modalDownloadLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDownloadLabel">Add Download</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="url-path" class="col-form-label">URL:</label>
+                        <input type="text" class="form-control" id="url-path">
+                    </div>
+                    <div class="form-group">
+                        <label for="save-name" class="col-form-label">Save Name:</label>
+                        <input type="text" class="form-control" id="save-name">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="remoteDownload()">Go</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 
@@ -56,6 +88,7 @@
     var deepIdxArr = new Array()
 
     let downloadJsonUrl = "http://localhost:8900/download/json";
+    let remoteDownloadUrl = "http://localhost:8900/dd"
     let sharedUrl = "http://localhost:8900/shared";
     let removeUrl = "http://localhost:8900/files/remove";
 
@@ -127,6 +160,8 @@
         }
 
         if (deepObjArr == null){return}
+
+        sortRow();
 
         var length = deepObjArr.length;
         var arr = deepObjArr;
@@ -211,8 +246,9 @@
         var updateth = document.createElement("td")
         var time = obj["ModTime"];
         var unixTimestamp = new Date(time*1000);
-        var commonTime = unixTimestamp.toLocaleString('chinese', { hour12: false });
-        updateth.innerText=commonTime
+        var dateTime = unixTimestamp.toLocaleDateString('chinese', { hour12: false });
+        var timeTime = unixTimestamp.toLocaleTimeString('chinese', { hour12: false });
+        updateth.innerText=dateTime+" "+timeTime;
         tr.appendChild(updateth)
 
         var opth = document.createElement("td")
@@ -224,20 +260,18 @@
         var unit = "b";
         if (size / 1024 > 1){
             size = size/1024;
-            unit = "kb"
+            unit = "kB"
         }
         if (size / 1024 > 1){
             size = size/1024;
-            unit = "Mb"
+            unit = "MB"
         }
         if (size / 1024 > 1){
             size = size/1024;
-            unit = "Gb"
+            unit = "GB"
         }
 
         size = size.toFixed(number);
-        let reg = new RegExp("\.0+$","g");
-        size = size.replace(reg,"")
 
         return size + " " + unit
     }
@@ -381,6 +415,11 @@
 
     function sharedAction(caller,obj) {
         event.cancelBubble = true;
+
+        if (sharedUrl.length <= 0 || sharedUrl==null) {
+            showFailed("Unsupported Feature");
+            return;
+        }
 
         if (clearPopover(caller)) return;
 
@@ -736,6 +775,153 @@
         setTimeout(function () {
             document.body.removeChild(dialog);
         },dismissTime);
+    }
+
+    //Sort Row
+    var sortType = 0;
+    var sortOrderIncrease = false;
+    function sortRow() {
+        if (sortType <= 0) {
+            return ;
+        }
+
+        switch (sortType) {
+            case 1: {
+                sortWithName();
+                break;
+            }
+            case 2: {
+                sortWithSize();
+                break;
+            }
+            case 3:{
+                sortWithTime();
+                break;
+            }
+            default:{
+
+            }
+        }
+
+    }
+    function sortClickName() {
+        if (sortType === 1){
+            sortOrderIncrease = !sortOrderIncrease;
+        }else{
+            sortOrderIncrease = false;
+        }
+        sortType = 1;
+        sortIconChange();
+        reloadTable();
+    }
+    function sortWithName() {
+        deepObjArr.sort(function (a,b) {
+            if (a["IsDir"] && !b["IsDir"]) {
+                return -1;
+            }
+            if (b["IsDir"] && !a["IsDir"]) {
+                return 1;
+            }
+            return a["Name"].localeCompare(b["Name"]);
+        });
+
+        if (sortOrderIncrease){
+            deepObjArr.reverse();
+        }
+    }
+    function sortClickSize() {
+        if (sortType === 2){
+            sortOrderIncrease = !sortOrderIncrease;
+        }else{
+            sortOrderIncrease = false;
+        }
+        sortType = 2;
+        sortIconChange();
+        reloadTable();
+    }
+    function sortWithSize() {
+
+        deepObjArr.sort(function (a,b) {
+            if (a["IsDir"] && !b["IsDir"]){
+                return 1;
+            }
+            if (b["IsDir"] && !a["IsDir"]){
+                return -1;
+            }
+            return b["Size"] - a["Size"];
+        });
+
+        if (sortOrderIncrease){
+            deepObjArr.reverse();
+        }
+    }
+    function sortClickTime() {
+        if (sortType === 3){
+            sortOrderIncrease = !sortOrderIncrease;
+        }else{
+            sortOrderIncrease = false;
+        }
+        sortType = 3;
+        sortIconChange();
+        reloadTable();
+    }
+    function sortWithTime() {
+        deepObjArr.sort(function (a,b) {
+            return b["ModTime"] - a["ModTime"];
+        });
+
+        if (sortOrderIncrease){
+            deepObjArr.reverse();
+        }
+    }
+    function sortIconChange() {
+        document.getElementById("sortIcon1").innerText = "";
+        document.getElementById("sortIcon2").innerText = "";
+        document.getElementById("sortIcon3").innerText = "";
+
+        var icon = "";
+        if (sortOrderIncrease){
+            icon = " ↑";
+        }else{
+            icon = " ↓";
+        }
+
+        let htmlId = "sortIcon" + sortType;
+        document.getElementById(htmlId).innerText = icon;
+    }
+
+    function remoteDownload() {
+        var url = document.getElementById("url-path").value;
+        var name = document.getElementById("save-name").value;
+
+        if (url.length > 0 && url.startsWith("http")){
+        }else {
+            showFailed("URL is not legal.");
+            return;
+        }
+
+        var xhttp;
+        xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4) {
+                if (this.status == 200){
+
+                }else {
+                    showFailed(this.responseText);
+                }
+            }
+        };
+
+        var requestUrl = remoteDownloadUrl + "?url=" + encodeURI(url);
+        if (name.length > 0){
+            requestUrl += "&filename=" + name;
+        }
+
+        xhttp.open("GET", requestUrl, true);
+
+        xhttp.send();
+
+        $('#modalDownload').modal('hide')
     }
 
 </script>
