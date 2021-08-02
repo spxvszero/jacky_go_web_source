@@ -25,6 +25,9 @@
             </div>
             <div class="col"></div>
             <div class="col-sm-1" style="display: contents">
+                <button class="btn btn-primary" style="margin-top: 10px;margin-bottom: 10px;margin-right: 5px;" data-toggle="modal" data-target="#modalDownloadList" onclick="getDownloadTaskList()">≡</button>
+            </div>
+            <div class="col-sm-1" style="display: contents">
                 <button class="btn btn-primary" style="margin-top: 10px;margin-bottom: 10px;" data-toggle="modal" data-target="#modalDownload">+</button>
             </div>
             <input id="search-input" placeholder="Search" class="form-control col-sm-2" style="margin-top: 10px; margin-bottom: 10px;margin-left: 15px;margin-right: 15px;">
@@ -85,6 +88,34 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalDownloadList" tabindex="-1" role="dialog" aria-labelledby="modalDownloadListLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDownloadListLabel">Download List</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body container-fluid">
+                    <div id="task-list-body" style="table-layout: fixed;word-break: break-all;">
+                        <table id="task-list-table" style="width: 100%;">
+                            <tbody id="task-list-table-body">
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="task-list-body-empty" style="display: none;flex-direction: column;align-items: center;">
+                        <div style="display: flex;">Empty Task List!</div>
+                    </div>
+                </div>
+                <div id="task-list-table-footer" class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="clearDownloadTasks()">Clear Tasks</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 <script>
@@ -93,10 +124,14 @@
     var deepIdx
     var deepIdxArr = new Array()
 
-    let downloadJsonUrl = localtion.origin + "/download/json";
-    let remoteDownloadUrl = localtion.origin + "/dd"
-    let sharedUrl = localtion.origin + "/shared";
-    let removeUrl = localtion.origin + "/files/remove";
+    // let downloadJsonUrl = location.origin + "/download/json";
+    // let remoteDownloadUrl = location.origin + "/dd"
+    // let sharedUrl = location.origin + "/shared";
+    // let removeUrl = location.origin + "/files/remove";
+    let downloadJsonUrl = "http://localhost:8900" + "/download/json";
+    let remoteDownloadUrl = "http://localhost:8900" + "/remote_download"
+    let sharedUrl = "http://localhost:8900" + "/shared";
+    let removeUrl = "http://localhost:8900" + "/files/remove";
 
     var curPopoverObj;
 
@@ -328,7 +363,7 @@
             "</svg>";
         perViewBtn.onclick = function(caller, obj) {
             return function() {
-                // downloadAction(caller,obj);
+                previewAction(caller, obj);
             };
         }(perViewBtn, obj);
         td.appendChild(perViewBtn);
@@ -387,7 +422,7 @@
     }
 
 
-    function downloadFileWithObj(btn, obj) {
+    function downloadFileWithObj(btn, obj, preview) {
         // var xhttp;
         // xhttp = new XMLHttpRequest();
         // xhttp.onreadystatechange = function() {
@@ -406,6 +441,14 @@
         }
 
         var url = downloadJsonUrl + "?filePath=" + path;
+        if (preview) {
+            if (obj["IsDir"]) {
+                showFailed("Dir could not preview.")
+                return
+            } else {
+                url += "&download=true";
+            }
+        }
         //
         // xhttp.open("GET", url , true);
 
@@ -422,8 +465,14 @@
         // caller.appendChild(span)
         // $(caller).prop('disabled', true)
 
-        downloadFileWithObj(caller, obj)
+        downloadFileWithObj(caller, obj, false)
     }
+
+    function previewAction(caller, obj) {
+        event.cancelBubble = true;
+        downloadFileWithObj(caller, obj, true)
+    }
+
 
     function sharedAction(caller, obj) {
         event.cancelBubble = true;
@@ -442,7 +491,7 @@
                 var content = "";
                 if (this.status == 200) {
                     title = "Shared Success";
-                    content = window.location.origin + '/' + sharedUrl + '/' + this.responseText;
+                    content = sharedUrl + '/' + this.responseText;
                 } else {
                     title = "Shared Failed";
                     content = this.responseText;
@@ -929,9 +978,7 @@
         xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4) {
-                if (this.status == 200) {
-
-                } else {
+                if (this.status == 200) {} else {
                     showFailed(this.responseText);
                 }
             }
@@ -947,6 +994,169 @@
         xhttp.send();
 
         $('#modalDownload').modal('hide')
+    }
+
+    function getDownloadTaskList() {
+
+        var xhttp;
+        xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    jkconsole(this.responseText)
+                    createListWithData(JSON.parse(this.responseText))
+                } else {
+                    showFailed(this.responseText);
+                }
+            }
+        };
+
+        var requestUrl = remoteDownloadUrl + "?type=list";
+
+        xhttp.open("GET", requestUrl, true);
+
+        xhttp.send();
+    }
+
+    function clearDownloadTasks() {
+        var xhttp;
+        xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    getDownloadTaskList();
+                } else {
+                    showFailed(this.responseText);
+                }
+            }
+        };
+
+        var requestUrl = remoteDownloadUrl + "?type=clear";
+
+        xhttp.open("GET", requestUrl, true);
+
+        xhttp.send();
+    }
+
+    function createListWithData(data) {
+
+        if (data != null) {
+            visableTaskList(true)
+
+            sortTaskListData(data)
+
+            let table = document.getElementById("task-list-table-body")
+
+            table.innerHTML = "<tr>\
+                                    <th>\
+                                    </th>\
+                                    <th style=\"width: 30%;\">\
+                                    </th>\
+                                </tr>\
+            "
+
+            for (let index = 0; index < data.length; index++) {
+                const subData = data[index];
+
+                // 0-ready 1-running 3-finished 4-failed
+                let status = subData["Status"]
+
+                let statusStyle = ""
+                if (status === 0) {
+                    statusStyle = "bg-secondary"
+                } else if (status === 1) {
+                    statusStyle = "bg-primary"
+                } else if (status === 3) {
+                    statusStyle = "bg-success"
+                } else if (status === 4) {
+                    statusStyle = "bg-danger"
+                } else {
+                    statusStyle = "bg-warning"
+                }
+
+
+                let tr = document.createElement("tr")
+
+                let nametd = document.createElement("td")
+                let name = ""
+                if (subData["SaveName"] && subData["SaveName"] != null) {
+                    name = subData["SaveName"]
+                } else {
+                    name = "< Name Not Found >"
+                }
+
+                nametd.innerHTML = "<div onclick=\"toggleDisplay(this)\">\
+                                            <div>" + name + "</div>\
+                                            <div style=\"display: none;\">" + subData["SourceUrl"] + "</div>\
+                                        </div>"
+
+                let progresstd = document.createElement("td")
+                let progressValue = (parseFloat(subData["Progress"]) * 100).toFixed(2);
+                let progressWord = progressValue + "%"
+                if (status === 0) {
+                    progressValue = 100;
+                    progressWord = "Waiting"
+                } else if (status === 3) {
+                    progressValue = 100;
+                    progressWord = "Done"
+                } else if (status === 4) {
+                    progressValue = 100;
+                    progressWord = "Failed"
+                }
+                progresstd.innerHTML = "<div class=\"progress\">\
+                <div class=\"progress-bar " + statusStyle + "\"role=\"progressbar\"style=\"width:" + progressValue + "%" + "\"aria-valuenow=\"" + progressValue + "\"aria-valuemin=\"0\"aria-valuemax=\"100\">" + progressWord + "</div>\
+                </div>"
+
+                tr.append(nametd)
+                tr.append(progresstd)
+
+                table.append(tr)
+            }
+        } else {
+            visableTaskList(false)
+        }
+    }
+
+    function sortTaskListData(data) {
+        data.sort(function(a, b) {
+            if (a["Status"] === b["Status"]) {
+                return a["Progress"] > b["Progress"] ? 1 : -1;
+            } else {
+                if (a["Status"] > b["Status"]) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        })
+    }
+
+    function toggleDisplay(ele) {
+        let elements = ele.children;
+        for (let index = 0; index < elements.length; index++) {
+            const element = elements[index];
+            if (element.style.display === "none") {
+                element.style.display = "inherit";
+            } else {
+                element.style.display = "none";
+            }
+        }
+    }
+
+    function visableTaskList(visable) {
+        let footer = document.getElementById("task-list-table-footer")
+        let taskBody = document.getElementById("task-list-body")
+        let taskBodyEmpty = document.getElementById("task-list-body-empty")
+
+        if (visable) {
+            footer.style.display = "inherit"
+            taskBody.style.display = "inherit"
+            taskBodyEmpty.style.display = "none"
+        } else {
+            footer.style.display = "none"
+            taskBody.style.display = "none"
+            taskBodyEmpty.style.display = "flex"
+        }
     }
 </script>
 
