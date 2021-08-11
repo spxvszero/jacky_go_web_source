@@ -8,6 +8,606 @@
     <script src="jsscript/jquery-3.4.1.slim.min.js"></script>
     <script src="jsscript/popper.min.js"></script>
     <script src="jsscript/bootstrap.min.js"></script>
+
+    <!-- moovie.css -->
+    <style>
+         :root {
+            --moovie_main_color: #3191f7;
+            --moovie_bg_controls: rgba(16, 34, 62, 0.6);
+            --moovie_bg_submenu: #f7f7f7;
+            --moovie_bg_cuetimer: #2b2b2b;
+            --moovie_submenu_options_fcolor: #515151;
+            --moovie_topic_submenu_fcolor: #797979;
+            --moovie_currenttime_color: white;
+            --moovie_caption_fcolor: white;
+            --moovie_cuetimer_fcolor: white;
+            --moovie_submenu_options_fsize: 10pt;
+            --moovie_topic_submenu_fsize: 9pt;
+            --moovie_currenttime_fsize: 11pt;
+            --moovie_cuetimer_fsize: 10pt;
+            --moovie_svgicons_width: 15px;
+            --moovie_svgicons_height: 30px;
+            --moovie_padding_controls: 13px
+        }
+        
+        video {
+            background: 0 0;
+            border-bottom: 1px solid transparent;
+            display: block;
+            outline: 0!important
+        }
+        
+        .moovie_tooltip {
+            position: absolute;
+            margin-top: -66px;
+            background-color: var(--moovie_bg_cuetimer);
+            padding: 5px 10px 5px 10px;
+            border-radius: 3px;
+            font-size: 10pt;
+            opacity: 0;
+            pointer-events: none;
+            white-space: nowrap;
+            -o-transition: opacity .2s ease-in-out;
+            -ms-transition: opacity .2s ease-in-out;
+            -moz-transition: opacity .2s ease-in-out;
+            -webkit-transition: opacity .2s ease-in-out;
+            transition: opacity .2s ease-in-out;
+            z-index: 4
+        }
+        
+        .player__button:hover .moovie_tooltip {
+            opacity: 1
+        }
+        
+        .moovie_cevent {
+            position: absolute;
+            z-index: 999;
+            background-color: #000;
+            padding: 10px 20px 10px 20px;
+            color: #fff;
+            cursor: pointer;
+            border: 1px solid #1c1c1c;
+            border-radius: 4px
+        }
+        
+        .moovie_cevent:hover {
+            color: grey
+        }
+        
+        .top-left {
+            top: 49px;
+            left: 25px
+        }
+        
+        .top-center {
+            top: 49px;
+            right: 50%;
+            transform: translate(50%, -50%)
+        }
+        
+        .top-right {
+            top: 49px;
+            right: 25px
+        }
+        
+        .bottom-left {
+            bottom: 73px;
+            left: 25px
+        }
+        
+        .bottom-center {
+            bottom: 73px;
+            right: 50%;
+            transform: translate(50%, -50%)
+        }
+        
+        .bottom-right {
+            bottom: 73px;
+            right: 25px
+        }
+        
+        .moovie {
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+            font-family: Arial;
+            border-radius: 7px;
+            outline: 0!important
+        }
+        
+        .loadingv {
+            width: 100%;
+            position: absolute;
+            height: 100%;
+            z-index: 5
+        }
+        
+        .loading {
+            height: 20px;
+            text-align: center;
+            position: absolute;
+            overflow: hidden;
+            font-style: italic;
+            bottom: -5px;
+            width: 100%
+        }
+        
+        .moovie_bg {
+            position: absolute;
+            left: -46px;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            z-index: -1;
+            background: -webkit-repeating-linear-gradient(145deg, #f8e9db 1px, #fff5ed 2px, #fff5ed 11px, #f8e9db 12px, #f8e9db 20px);
+            background: repeating-linear-gradient(-55deg, #1c1c1c 1px, #464646 2px, #464646 11px, #242424 12px, #222 20px);
+            -webkit-animation-name: moovie_stripes;
+            -webkit-animation-duration: .6s;
+            -webkit-animation-timing-function: linear;
+            -webkit-animation-iteration-count: infinite;
+            animation-name: moovie_stripes;
+            animation-duration: .6s;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite
+        }
+        
+        .moovie_cuetime {
+            opacity: 0;
+            background-color: var(--moovie_bg_cuetimer);
+            position: absolute;
+            margin-top: -17px;
+            z-index: 9999;
+            margin-left: 30px;
+            font-size: var(--moovie_cuetimer_fsize);
+            padding: 1px 5px 1px 5px;
+            border-radius: 3px;
+            left: 0;
+            transform: translate(14px, -3px);
+            color: var(--moovie_cuetimer_fcolor);
+            -o-transition: opacity .2s ease-in-out;
+            -ms-transition: opacity .2s ease-in-out;
+            -moz-transition: opacity .2s ease-in-out;
+            -webkit-transition: opacity .2s ease-in-out;
+            transition: opacity .2s ease-in-out
+        }
+        
+        .moovie_cuetime_small {
+            top: -12px!important;
+            margin-left: -19px!important;
+            transform: translate(0)!important
+        }
+        
+        .responsive_bar {
+            position: absolute!important;
+            width: 100%!important;
+            left: -11px!important;
+            top: -15px!important
+        }
+        
+        .labelformat {
+            position: absolute;
+            right: 22px;
+            background-color: #686868;
+            color: #fff;
+            border-radius: 4px;
+            margin-top: 1px;
+            font-size: 7pt;
+            letter-spacing: 1px;
+            font-weight: 700;
+            width: 37px;
+            height: 20px;
+            padding-left: 9px;
+            line-height: 20px
+        }
+        
+        .moovie_submenu {
+            position: absolute;
+            bottom: 11px;
+            right: 26px;
+            margin-bottom: 56px;
+            background-color: var(--moovie_bg_submenu);
+            border-radius: 5px;
+            box-shadow: 1px 2px 2px 0 #242424;
+            z-index: 5
+        }
+        
+        .moovie_submenu ul {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 8px 0;
+            text-align: left
+        }
+        
+        .moovie_captionspot {
+            color: var(--moovie_caption_fcolor);
+            position: absolute;
+            z-index: 0;
+            width: 100%;
+            bottom: 40px;
+            pointer-events: none;
+            text-align: center!important
+        }
+        
+        .moovie_caption {
+            width: 55%;
+            margin: 0 auto;
+            text-shadow: 1px 1px 1px #000;
+            pointer-events: none;
+            z-index: 0;
+            transition: all .2s ease 0s
+        }
+        
+        .caption_size {
+            font-size: 17pt
+        }
+        
+        .moovie_submenu ul li {
+            padding: 10px 14px 10px 14px;
+            font-size: var(--moovie_submenu_options_fsize);
+            width: 170px;
+            margin: 0 12px 0 10px;
+            border-radius: 2px;
+            color: var(--moovie_submenu_options_fcolor)
+        }
+        
+        .moovie_submenu ul li:hover {
+            background-color: var(--moovie_main_color);
+            cursor: pointer;
+            transition: all .2s ease;
+            color: #fff
+        }
+        
+        .moovie_submenu ul li:hover .labelformat {
+            background-color: #fff;
+            color: var(--moovie_main_color)
+        }
+        
+        .option_submenu {
+            position: absolute;
+            right: 28px;
+            font-weight: 700
+        }
+        
+        .poster_layer {
+            outline: 0!important;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            cursor: pointer;
+            box-sizing: border-box;
+            background-repeat: no-repeat
+        }
+        
+        .poster_layer:hover .poster_center {
+            opacity: 1
+        }
+        
+        .poster_center {
+            position: relative;
+            width: 100%;
+            padding: 10px;
+            color: #fff;
+            transform: translate(0, -50%);
+            top: 50%;
+            text-align: center;
+            opacity: .8
+        }
+        
+        .poster_button {
+            width: fit-content;
+            padding: 16px;
+            border-radius: 100%;
+            position: relative;
+            margin: 0 auto;
+            background-color: #000000db;
+            box-sizing: border-box;
+            pointer-events: none
+        }
+        
+        .poster_button:hover {
+            opacity: .8;
+            transition: all .2s ease
+        }
+        
+        .player__button {
+            background: 0 0;
+            line-height: 1;
+            color: #fff;
+            text-align: center;
+            height: var(--moovie_svgicons_height);
+            outline: 0;
+            padding: 0 15px 0 15px;
+            background-color: transparent;
+            margin-right: 4px;
+            border: 0;
+            border-radius: 4px
+        }
+        
+        .player__button:hover {
+            transition: all .2s ease;
+            background-color: var(--moovie_main_color);
+            cursor: pointer
+        }
+        
+        .player__button svg {
+            width: var(--moovie_svgicons_width);
+            position: relative;
+            top: 2px;
+            height: var(--moovie_svgicons_height);
+            vertical-align: baseline
+        }
+        
+        .player_button_disabled {
+            cursor: default!important;
+            background-color: transparent!important
+        }
+        
+        .moovie_currentime {
+            color: var(--moovie_currenttime_color);
+            font-size: var(--moovie_currenttime_fsize);
+            padding-top: 10px
+        }
+        
+        .player__button:focus {
+            border-color: #ffc600;
+            outline: 0
+        }
+        
+        .player__slider {
+            width: 10px;
+            height: 30px
+        }
+        
+        .topic_submenu {
+            padding: 0 0 5px 0!important;
+            border-bottom: 1px dashed #e1e1e1!important;
+            width: auto!important;
+            color: var(--moovie_topic_submenu_fcolor)!important;
+            font-weight: 700!important;
+            background-color: transparent!important;
+            margin-bottom: 9px!important;
+            font-size: var(--moovie_topic_submenu_fsize)!important
+        }
+        
+        .moovie_controls {
+            box-sizing: border-box;
+            background-color: var(--moovie_bg_controls);
+            display: flex;
+            position: absolute;
+            bottom: 1px;
+            width: 100%;
+            height: 80px;
+            padding: var(--moovie_padding_controls);
+            z-index: 3;
+            -o-transition: opacity .2s ease-in-out;
+            -ms-transition: opacity .2s ease-in-out;
+            -moz-transition: opacity .2s ease-in-out;
+            -webkit-transition: opacity .2s ease-in-out;
+            transition: opacity .2s ease-in-out
+        }
+        
+        .moovie_progress {
+            position: relative;
+            display: flex;
+            flex-basis: 100%;
+            flex: 10;
+            height: 33px!important;
+            transition: height .3s;
+            background-color: rgba(55, 112, 168, 0);
+            cursor: pointer;
+            top: 0;
+            margin-right: 11px;
+            margin-left: 10px;
+            overflow: hidden
+        }
+        
+        .moovie_progress_sound {
+            position: relative;
+            display: flex;
+            flex-basis: 100%;
+            flex: 10;
+            height: 7px!important;
+            transition: height .3s;
+            background-color: rgba(233, 236, 239, .4);
+            cursor: pointer;
+            top: 15px;
+            margin-right: 11px;
+            margin-left: 10px
+        }
+        
+        .progress__filled {
+            width: 0%;
+            background: var(--moovie_main_color);
+            flex: 0;
+            flex-basis: 0%;
+            z-index: 2
+        }
+        
+        .progress__filled_buffered {
+            width: 12%;
+            background: #1d64ae;
+            position: absolute;
+            height: 12px;
+            z-index: 1
+        }
+        
+        .opacity_svg {
+            opacity: .4
+        }
+        
+        input[type=range] {
+            -webkit-appearance: none;
+            background: 0 0;
+            width: 100%;
+            z-index: 3
+        }
+        
+        input[type=range]:focus {
+            outline: 0
+        }
+        
+        input[type=range]::-webkit-slider-runnable-track {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 7px;
+            cursor: pointer;
+            background-color: rgba(233, 236, 239, .4);
+            border-radius: 1.3px;
+            border: .2px solid rgba(1, 1, 1, 0)
+        }
+        
+        input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 5px;
+            cursor: pointer;
+            background-color: rgba(198, 198, 198, .4);
+            border-radius: 1.3px
+        }
+        
+        input[type=range]::-webkit-range-thumb {
+            height: 13px;
+            width: 13px;
+            border-radius: 50px;
+            background: var(--moovie_main_color);
+            border: none;
+            cursor: pointer
+        }
+        
+        input[type=range]::-moz-range-thumb {
+            height: 13px;
+            width: 13px;
+            border-radius: 50px;
+            background: var(--moovie_main_color);
+            border: none;
+            cursor: pointer
+        }
+        
+        progress {
+            border-radius: 7px;
+            width: 100%;
+            height: 5px;
+            margin-left: -11.5%;
+            position: absolute;
+            margin-left: 0;
+            top: 14px;
+            border: 0;
+            z-index: 1;
+            background-color: #b32c2c00
+        }
+        
+        progress::-webkit-progress-bar {
+            background-color: transparent
+        }
+        
+        progress::-webkit-progress-value {
+            background-color: #fff;
+            opacity: .3
+        }
+        
+        progress::-moz-progress-bar {
+            background-color: #fff;
+            opacity: .3
+        }
+        
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 13px;
+            width: 13px;
+            border-radius: 100%;
+            background: var(--moovie_main_color);
+            cursor: pointer;
+            margin-top: -4.3px
+        }
+        
+        .lds-ellipsis {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%)
+        }
+        
+        .lds-ellipsis div {
+            position: absolute;
+            top: 33px;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--moovie_main_color);
+            animation-timing-function: cubic-bezier(0, 1, 1, 0)
+        }
+        
+        .lds-ellipsis div:nth-child(1) {
+            left: 8px;
+            animation: lds-ellipsis1 .6s infinite
+        }
+        
+        .lds-ellipsis div:nth-child(2) {
+            left: 8px;
+            animation: lds-ellipsis2 .6s infinite
+        }
+        
+        .lds-ellipsis div:nth-child(3) {
+            left: 32px;
+            animation: lds-ellipsis2 .6s infinite
+        }
+        
+        .lds-ellipsis div:nth-child(4) {
+            left: 56px;
+            animation: lds-ellipsis3 .6s infinite
+        }
+        
+        @keyframes lds-ellipsis1 {
+            0% {
+                transform: scale(0)
+            }
+            100% {
+                transform: scale(1)
+            }
+        }
+        
+        @keyframes lds-ellipsis3 {
+            0% {
+                transform: scale(1)
+            }
+            100% {
+                transform: scale(0)
+            }
+        }
+        
+        @keyframes lds-ellipsis2 {
+            0% {
+                transform: translate(0, 0)
+            }
+            100% {
+                transform: translate(24px, 0)
+            }
+        }
+        
+        @-webkit-keyframes moovie_stripes {
+            from {
+                -webkit-transform: translateX(0)
+            }
+            to {
+                -webkit-transform: translateX(46px)
+            }
+        }
+        
+        @keyframes moovie_stripes {
+            from {
+                transform: translateX(0)
+            }
+            to {
+                transform: translateX(46px)
+            }
+        }
+    </style>
+
 </head>
 
 <body onload="getDownloadDir()">
@@ -454,7 +1054,13 @@
 
         // xhttp.send();
 
-        window.open(url)
+        let name = obj["Name"]
+        let suffix = "mp4"
+        if (name.indexOf(suffix, name.length - suffix.length) === -1) {
+            window.open(url)
+        } else {
+            previewWithVideo(url)
+        }
     }
 
     function downloadAction(caller, obj) {
@@ -780,25 +1386,21 @@
 
     //toast function
     const showToastAnime = `
-        @keyframes toastAppear
-        {
-            from {opacity:0%;}
-            to {opacity:100%;}
+        .dialog{
+            position: fixed;
+            z-index: 9998;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-color: #0000;
+            text-align: center;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            opacity: 0;
         }
-        @-moz-keyframes toastAppear
-        {
-            from {opacity:0%;}
-            to {opacity:100%;}
-        }
-        @-webkit-keyframes toastAppear
-        {
-            from {opacity:0%;}
-            to {opacity:100%;}
-        }
-        @-o-keyframes toastAppear
-        {
-            from {opacity:0%;}
-            to {opacity:100%;}
+        .dialog.show{
+            opacity:1;
         }
     `;
     const style = document.createElement('style');
@@ -806,22 +1408,11 @@
     style.innerHTML = showToastAnime;
     document.getElementsByTagName('head')[0].appendChild(style);
 
-    function showFailed(msg) {
-        var dismissTime = 3000;
+    function showMsg(style, msg, dismissTime) {
 
         var dialog = document.createElement("div")
         dialog.innerHTML = "" +
-            "<div style=\"" +
-            "position: fixed;" +
-            "z-index: 9998;" +
-            "width: 100%;" +
-            "height: 100%;" +
-            "top: 0;" +
-            "left: 0;" +
-            "background-color: #0000;" +
-            "text-align: center;" +
-            "animation: toastAppear 0.5s ease-out;" +
-            "pointer-events: none;\">" +
+            "<div class=\"dialog\">" +
             "<btn style=\"" +
             "position: relative;" +
             "top: 80%;" +
@@ -830,14 +1421,28 @@
             "width: 50%;" +
             "pointer-events: none;" +
             "max-width: 300px;\" " +
-            "class=\"btn-danger\">" + msg + "</btn>" +
+            "class=\"" + style + "\">" + msg + "</btn>" +
             "</div>";
 
         document.body.appendChild(dialog);
+        setTimeout(function() {
+            dialog.children[0].classList.add("show");
+        }, 50);
 
+        setTimeout(function() {
+            dialog.children[0].classList.remove("show");
+        }, dismissTime - 300);
         setTimeout(function() {
             document.body.removeChild(dialog);
         }, dismissTime);
+    }
+
+    function showFailed(msg) {
+        showMsg("btn-danger", msg, 3000);
+    }
+
+    function showSuccess(msg) {
+        showMsg("btn-success", msg, 3000);
     }
 
     //Sort Row
@@ -978,13 +1583,15 @@
         xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4) {
-                if (this.status == 200) {} else {
+                if (this.status == 200) {
+                    showSuccess('Add Task Success!')
+                } else {
                     showFailed(this.responseText);
                 }
             }
         };
 
-        var requestUrl = remoteDownloadUrl + "?url=" + encodeURI(url);
+        var requestUrl = remoteDownloadUrl + "?url=" + btoa(url);
         if (name.length > 0) {
             requestUrl += "&filename=" + name;
         }
@@ -995,6 +1602,24 @@
 
         $('#modalDownload').modal('hide')
     }
+
+    var taskListTimer;
+    //download task list modal hidden event
+    $('#modalDownloadList').on('hidden.bs.modal', function(e) {
+        // do something...
+        clearInterval(taskListTimer);
+        taskListTimer = null;
+    })
+
+    //download task list modal show event
+    $('#modalDownloadList').on('shown.bs.modal', function(e) {
+        // do something...
+        if (taskListTimer == null) {
+            taskListTimer = setInterval(() => {
+                getDownloadTaskList();
+            }, 1000);
+        }
+    })
 
     function getDownloadTaskList() {
 
@@ -1047,80 +1672,148 @@
 
             let table = document.getElementById("task-list-table-body")
 
-            table.innerHTML = "<tr>\
+            if (document.getElementById("task-list-table-list-anchor") == null) {
+                table.innerHTML = "<tr id='task-list-table-list-anchor'>\
                                     <th>\
                                     </th>\
                                     <th style=\"width: 30%;\">\
                                     </th>\
                                 </tr>\
             "
+            }
+
+            //check rows with datas
+            let lists = new Array();
+            let copyDOM = Array.prototype.slice.call(table.children)
+            copyDOM.forEach((element) => {
+                if (element.getAttribute('id').startsWith('taskList-')) {
+                    if (lists.length >= data.length) {
+                        element.parentElement.removeChild(element);
+                    } else {
+                        lists.push(element);
+                    }
+                }
+            })
 
             for (let index = 0; index < data.length; index++) {
                 const subData = data[index];
 
-                // 0-ready 1-running 3-finished 4-failed
-                let status = subData["Status"]
-
-                let statusStyle = ""
-                if (status === 0) {
-                    statusStyle = "bg-secondary"
-                } else if (status === 1) {
-                    statusStyle = "bg-primary"
-                } else if (status === 3) {
-                    statusStyle = "bg-success"
-                } else if (status === 4) {
-                    statusStyle = "bg-danger"
+                let tr;
+                if (index >= lists.length) {
+                    tr = createTaskList();
+                    table.appendChild(tr);
                 } else {
-                    statusStyle = "bg-warning"
+                    tr = lists[index];
                 }
 
+                updateTaskListWithData(tr, subData);
 
-                let tr = document.createElement("tr")
-
-                let nametd = document.createElement("td")
-                let name = ""
-                if (subData["SaveName"] && subData["SaveName"] != null) {
-                    name = subData["SaveName"]
-                } else {
-                    name = "< Name Not Found >"
-                }
-
-                nametd.innerHTML = "<div onclick=\"toggleDisplay(this)\">\
-                                            <div>" + name + "</div>\
-                                            <div style=\"display: none;\">" + subData["SourceUrl"] + "</div>\
-                                        </div>"
-
-                let progresstd = document.createElement("td")
-                let progressValue = (parseFloat(subData["Progress"]) * 100).toFixed(2);
-                let progressWord = progressValue + "%"
-                if (status === 0) {
-                    progressValue = 100;
-                    progressWord = "Waiting"
-                } else if (status === 3) {
-                    progressValue = 100;
-                    progressWord = "Done"
-                } else if (status === 4) {
-                    progressValue = 100;
-                    progressWord = "Failed"
-                }
-                progresstd.innerHTML = "<div class=\"progress\">\
-                <div class=\"progress-bar " + statusStyle + "\"role=\"progressbar\"style=\"width:" + progressValue + "%" + "\"aria-valuenow=\"" + progressValue + "\"aria-valuemin=\"0\"aria-valuemax=\"100\">" + progressWord + "</div>\
-                </div>"
-
-                tr.append(nametd)
-                tr.append(progresstd)
-
-                table.append(tr)
             }
+
         } else {
             visableTaskList(false)
         }
     }
 
+    function createTaskList() {
+
+        let tr = document.createElement("tr")
+        tr.classList.add('task-list')
+
+        let nametd = document.createElement("td")
+        nametd.classList.add('task-content');
+
+        nametd.innerHTML = "<div onclick=\"toggleDisplay(this)\">\
+                                        <div class='task-content-name' style=\"display: contents;\">" + "</div>\
+                                        <div class='task-content-source' style=\"display: none;\">" + "</div>\
+                                        <button type=\"button\" class=\"btn btn-link\" style=\"padding: 0 0 3px 0;\" onclick=\"copyTaskElement(this)\">copy</button>\
+                                    </div>"
+
+        let progresstd = document.createElement("td")
+        progresstd.innerHTML = "<div class=\"progress\">\
+                <div class=\"progress-bar\"role=\"progressbar\"style=\"width: 100%" + "\"aria-valuenow=\"0\"aria-valuemin=\"0\"aria-valuemax=\"100\">" + "</div>\
+                </div>"
+
+        tr.append(nametd)
+        tr.append(progresstd)
+
+        return tr
+    }
+
+    function updateTaskListWithData(tr, data) {
+
+        //check if same list, if so ,maintain copy status
+        let copyStatus = false;
+        if (tr.getAttribute('id') === ("taskList-" + data['Identify'])) {
+            copyStatus = true;
+        }
+
+        tr.setAttribute('id', "taskList-" + data['Identify']);
+
+        // 0-ready 1-running 3-finished 4-failed
+        let status = data["Status"]
+
+        let statusStyle = ""
+        if (status === 0) {
+            statusStyle = "bg-secondary"
+        } else if (status === 1) {
+            statusStyle = "bg-primary"
+        } else if (status === 3) {
+            statusStyle = "bg-success"
+        } else if (status === 4) {
+            statusStyle = "bg-danger"
+        } else {
+            statusStyle = "bg-warning"
+        }
+
+        //change name
+        let nametd = tr.getElementsByClassName("task-content")[0]
+        let name = ""
+        if (data["SaveName"] && data["SaveName"] != null) {
+            name = data["SaveName"]
+        } else {
+            name = "< Name Not Found >"
+        }
+        nametd.getElementsByClassName('task-content-name')[0].innerText = name;
+        nametd.getElementsByClassName('task-content-source')[0].innerText = data["SourceUrl"];
+        if (!copyStatus) {
+            //reset status
+            nametd.getElementsByClassName('task-content-name')[0].style.display = 'contents';
+            nametd.getElementsByClassName('task-content-source')[0].style.display = 'none';
+        }
+
+
+        //change progress 
+        let progresstd = tr.getElementsByClassName('progress-bar')[0]
+        for (let j = 0; j < progresstd.classList.length; j++) {
+            const className = progresstd.classList[j];
+            if (className.startsWith('bg-')) {
+                progresstd.classList.remove(className);
+            }
+        }
+        progresstd.classList.add(statusStyle);
+        let progressValue = (parseFloat(data["Progress"]) * 100).toFixed(2);
+        let progressWord = progressValue + "%"
+        if (status === 0) {
+            progressValue = 100;
+            progressWord = "Waiting"
+        } else if (status === 3) {
+            progressValue = 100;
+            progressWord = "Done"
+        } else if (status === 4) {
+            progressValue = 100;
+            progressWord = "Failed"
+        }
+        progresstd.style.width = progressValue + "%";
+        progresstd.setAttribute('aria-valuenow', progressValue);
+        progresstd.innerText = progressWord;
+    }
+
+
     function sortTaskListData(data) {
         data.sort(function(a, b) {
             if (a["Status"] === b["Status"]) {
-                return a["Progress"] > b["Progress"] ? 1 : -1;
+                return a["CreateAt"] < b["CreateAt"] ? 1 : -1;
             } else {
                 if (a["Status"] > b["Status"]) {
                     return 1;
@@ -1135,12 +1828,84 @@
         let elements = ele.children;
         for (let index = 0; index < elements.length; index++) {
             const element = elements[index];
+            if (element.tagName === "BUTTON") {
+                continue
+            }
             if (element.style.display === "none") {
-                element.style.display = "inherit";
+                element.style.display = "contents";
             } else {
                 element.style.display = "none";
             }
         }
+    }
+
+    function copyTaskElement(btn) {
+        event.cancelBubble = true;
+
+        let elements = btn.parentElement.children;
+        for (let index = 0; index < elements.length; index++) {
+            const element = elements[index];
+            if (element.tagName === "BUTTON") {
+                continue
+            }
+            if (element.style.display !== "none") {
+                copyTextToClipboard(element.innerText)
+                break
+            }
+        }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+        var textArea = document.createElement("textarea");
+        textArea.value = text;
+
+        // Avoid scrolling to bottom
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+
+        document.body.appendChild(textArea);
+
+        //if apple
+        if (navigator.userAgent.match(/ipad|iphone/i)) {
+            //range
+            let range = document.createRange();
+            range.selectNodeContents(textArea);
+            let selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            textArea.setSelectionRange(0, 999999);
+        } else {
+            textArea.select();
+        }
+
+        textArea.focus();
+
+        try {
+            var successful = document.execCommand('copy');
+            var msg = successful ? 'successful' : 'unsuccessful';
+            console.log('Fallback: Copying text command was ' + msg);
+            successful ? showSuccess("copy success!") : showFailed("copy failed!")
+        } catch (err) {
+            console.error('Fallback: Oops, unable to copy', err);
+            showFailed("copy error!")
+        }
+
+        document.body.removeChild(textArea);
+    }
+
+    function copyTextToClipboard(text) {
+        if (!navigator.clipboard) {
+            fallbackCopyTextToClipboard(text);
+            return;
+        }
+        navigator.clipboard.writeText(text).then(function() {
+            console.log('Async: Copying to clipboard was successful!');
+            showSuccess("copy success!")
+        }, function(err) {
+            console.error('Async: Could not copy text: ', err);
+            showFailed("copy failed!")
+        });
     }
 
     function visableTaskList(visable) {
@@ -1156,6 +1921,980 @@
             footer.style.display = "none"
             taskBody.style.display = "none"
             taskBodyEmpty.style.display = "flex"
+        }
+    }
+
+    function closePreviewer(ele) {
+        let previewer = ele.parentElement.parentElement;
+        document.body.removeChild(previewer)
+    }
+
+    function previewWithVideo(url) {
+        let previewer = document.createElement("div")
+
+        // if (flvjs.isSupported()) {
+
+        //     previewer.innerHTML = "<div style=\"background: rgba(1,1,1,0.3);position: fixed;display:flex;z-index: 11;top: 0;width: 100%;height: 100%;\">\
+        //                         <div style=\"z-index:11;position: absolute;top: -60px;right: -60px;width: 120px;color: white;border-radius: 100%;height: 120px;text-align: left;vertical-align: bottom;background: #0000007a;margin: 0 auto;\" onclick=\"closePreviewer(this)\">\
+        //                             <div style='bottom: 0px;position: absolute;width: 60px;height: 60px;line-height: 50px;text-align: center;padding-left: 10px;font-size: 25px;font-weight: 500;'>X</div>\
+        //                             </div>\
+        //                         <video id=\"video-previewer\">\
+        //                             Your browser does not support the video tag.\
+        //                         </video>\
+        //                     </div>"
+
+
+        //     document.body.append(previewer)
+
+        //     var videoElement = document.getElementById('video-previewer');
+        //     var flvPlayer = flvjs.createPlayer({
+        //         type: 'flv',
+        //         url: url
+        //     });
+        //     flvPlayer.attachMediaElement(videoElement);
+        //     flvPlayer.load();
+        //     flvPlayer.play();
+
+        //     return
+        // }
+
+        previewer.innerHTML = "<div style=\"background: rgba(1,1,1,0.3);position: fixed;display:flex;z-index: 11;top: 0;width: 100%;height: 100%;\">\
+                                <div style=\"z-index:11;position: absolute;top: -60px;right: -60px;width: 120px;color: white;border-radius: 100%;height: 120px;text-align: left;vertical-align: bottom;background: #0000007a;margin: 0 auto;\" onclick=\"closePreviewer(this)\">\
+                                    <div style='bottom: 0px;position: absolute;width: 60px;height: 60px;line-height: 50px;text-align: center;padding-left: 10px;font-size: 25px;font-weight: 500;'>X</div>\
+                                    </div>\
+                                <video id=\"video-previewer\">\
+                                    <source src=" + url + " type='video/mp4'>\
+                                    Your browser does not support the video tag.\
+                                </video>\
+                            </div>"
+
+
+        document.body.append(previewer)
+
+        var demo = new Moovie({
+            selector: "#video-previewer",
+            dimensions: {
+                width: "100%"
+            }
+        });
+
+        let urls = new Array()
+        for (const obj in deepObjArr) {
+            if (Object.hasOwnProperty.call(deepObjArr, obj)) {
+                const element = deepObjArr[obj];
+                const listObj = getPlayListObjFromObj(element);
+                if (listObj != null) {
+                    urls.push(listObj);
+                }
+
+            }
+        }
+
+        // Call External Plugin
+        var PlaylistPlugin = new _Moovie_Playlist({
+            reference: demo, // variable that initializated moovie
+            sources: urls,
+            dimensions: {
+                width: "240px",
+                height: "100%"
+            }
+        });
+
+    }
+
+    function getPlayListObjFromObj(obj) {
+
+        let name = obj["Name"]
+        let suffix = "mp4"
+        if (name.indexOf(suffix, name.length - suffix.length) === -1) {
+            return null
+        }
+        if (obj["DirPath"] && obj["DirPath"].length > 0) {
+            path = obj["DirPath"] + '/' + obj["Name"];
+        } else {
+            path = obj["Name"];
+        }
+
+        var url = downloadJsonUrl + "?filePath=" + path;
+        if (preview) {
+            if (obj["IsDir"]) {
+                return null
+            } else {
+                url += "&download=true";
+            }
+        }
+
+        return {
+            "src": encodeURI(url),
+            "title": obj["Name"]
+        }
+    }
+</script>
+
+<!-- Moovie.js -->
+<script>
+    //Moovie.js
+    class Moovie {
+        constructor(options) {
+            const defaults = {
+                selector: "defaultId",
+                dimensions: {
+                    width: "100%"
+                },
+                config: {
+                    storage: {
+                        captionOffset: !1,
+                        playrateSpeed: !1,
+                        captionSize: !1
+                    },
+                    controls: {
+                        playtime: !0,
+                        mute: !0,
+                        volume: !0,
+                        subtitles: !0,
+                        config: !0,
+                        fullscreen: !0,
+                        submenuCaptions: !0,
+                        submenuOffset: !0,
+                        submenuSpeed: !0,
+                        allowLocalSubtitles: !0
+                    },
+                    i18n: {
+                        play: "(Play:Pause)",
+                        mute: "(Mute:Unmute)",
+                        subtitles: "(Enable:Disable) Subtitles",
+                        config: "Settings",
+                        fullscreen: "(Enter:Exit) Fullscreen",
+                        main_topic: "settings:",
+                        main_caption: "Captions",
+                        main_offset: "Caption Offset",
+                        main_speed: "Speed",
+                        main_disabled: "Disabled",
+                        main_default: "Default",
+                        caption_topic: "Captions:",
+                        caption_back: "Back",
+                        caption_load: "Load Locally",
+                        offset_topic: "Adjust Caption Offset",
+                        speed_topic: "Speed Adjust"
+                    }
+                },
+                icons: {
+                    path: "./icons/"
+                },
+                customEvents: [{
+                    type: "",
+                    to: "",
+                    starttime: "",
+                    endtime: "",
+                    content: "",
+                    position: "",
+                    class: ""
+                }]
+            };
+            var randomID = Math.floor(1e4 * Math.random()) + 0;
+            for (var key in null == options.config ? options.config = defaults.config : options.config, null == options.config.controls ? options.config.controls = defaults.config.controls : options.config.controls, defaults.config.controls) null == options.config.controls[key] ? options.config.controls[key] = defaults.config.controls[key] : options.config.controls[key] = options.config.controls[key];
+            for (var key in null == options.config.storage ? options.config.storage = defaults.config.storage : options.config.storage, defaults.config.storage) null == options.config.storage[key] ? options.config.storage[key] = defaults.config.storage[key] : options.config.storage[key] = options.config.storage[key];
+            for (var key in null == options.config.i18n ? options.config.i18n = defaults.config.i18n : options.config.i18n, defaults.config.i18n) null == options.config.i18n[key] ? options.config.i18n[key] = defaults.config.i18n[key] : options.config.i18n[key] = options.config.i18n[key];
+            this.selector = options.selector.substring(1) || defaults.selector.substring(1), this.dimensions = options.dimensions || defaults.dimensions, this.config = options.config || defaults.config, this.i18n = options.config.i18n || defaults.config.i18n, this.icons = options.icons || defaults.icons, this.customEvents = options.customEvents || defaults.customEvents, this.element = document.getElementById(this.selector), this.randomID = randomID, this.options = options || defaults, this.events = {
+                captions: {
+                    name: !1,
+                    subtitles: !1
+                },
+                offset: {
+                    value: !1
+                }
+            };
+            var _this = this,
+                parts, video, subtitles = 0,
+                fullyloaded = 0,
+                cuevalue = 0,
+                speed = 1,
+                moovie_el_play, moovie_el_buffered, moovie_el_mute, moovie_el_subtitles, moovie_el_fullscreen, moovie_el_locally, moovie_ul_soundv, moovie_el_sinput, moovie_el_rinput, hassubtitles = 0,
+                moovie_el_range, moovie_el_localsub, moovie_el_speed, moovie_ishiden = 0,
+                moovie_el_cuetimer, moovie_el_player, moovie_elprogress, moovie_el_toggle, ranges, fullscreen, offsettime = 0,
+                isopen = 0,
+                moovie_el_volume, moovie_el_video, moovie_el_poster, moovie_el_submenu, moovie_el_controls, moovie_el_progress, moovie_el_captions, moovie_el_submain, selectedCaption = [],
+                icons = this.icons,
+                config = this.config,
+                dimensions = this.dimensions,
+                selector = this.selector,
+                customEvents = this.customEvents,
+                mainmenu = this.mainmenu = [{
+                    name: "play_button",
+                    element: "<button class='player__button toggle' id='tooglebutton_" + randomID + "'>                <svg id='moovie_bplay_play_" + randomID + '\' version="1.1" fill="white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="163.861px" height="163.861px" viewBox="0 0 163.861 163.861" style="enable-background:new 0 0 163.861 163.861;" xml:space="preserve"><g><path d="M34.857,3.613C20.084-4.861,8.107,2.081,8.107,19.106v125.637c0,17.042,11.977,23.975,26.75,15.509L144.67,97.275c14.778-8.477,14.778-22.211,0-30.686L34.857,3.613z"/></g></svg>                <svg id=\'moovie_bplay_pause_' + randomID + '\' style=\'display:none;\' version="1.1" fill="white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 47.607 47.607" style="enable-background:new 0 0 47.607 47.607;" xml:space="preserve"><g><path  d="M17.991,40.976c0,3.662-2.969,6.631-6.631,6.631l0,0c-3.662,0-6.631-2.969-6.631-6.631V6.631C4.729,2.969,7.698,0,11.36,0l0,0c3.662,0,6.631,2.969,6.631,6.631V40.976z"/><path d="M42.877,40.976c0,3.662-2.969,6.631-6.631,6.631l0,0c-3.662,0-6.631-2.969-6.631-6.631V6.631C29.616,2.969,32.585,0,36.246,0l0,0c3.662,0,6.631,2.969,6.631,6.631V40.976z"/></g></svg>                </button>',
+                    opcional: !1,
+                    tooltip: this.i18n.play
+                }, {
+                    name: "progress_bar",
+                    element: "<div class='moovie_cuetime' id='moovie_cue_timer_" + randomID + "'>loading...</div><div id='moovie_moovie_el_progressbar_" + randomID + "' class='moovie_progress player__slider' top:15px;><input type='range' id='range_progress_" + randomID + "' class='styled-slider slider-progress' min='0' value='0' step='0.01' autocomplete='off' style='width: 100%; cursor:pointer;' /><canvas id='moovie_buffered_" + randomID + "' style='position: absolute; bottom: 14px; left: 0; opacity: 0.4;  width: 100%; height:5px;'></canvas></div>",
+                    opcional: !1,
+                    tooltip: !1
+                }, {
+                    name: "playtime",
+                    element: "<div id='moovie_el_current_" + randomID + "' class='player__button player_button_disabled moovie_currentime'><span id='moovie_currentime_" + randomID + "'>00:00</span> / <span id='moovie_fulltime_" + randomID + "'></span></div>",
+                    opcional: !0,
+                    tooltip: !1
+                }, {
+                    name: "mute",
+                    element: "<button id='mooviegrid_mute_" + randomID + "' class='player__button'>                <svg id=\"icon_volume_unmute_" + randomID + '" version="1.1" fill="white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 480 480" style="enable-background:new 0 0 480 480;" xml:space="preserve"><path d="M278.944,17.577c-5.568-2.656-12.128-1.952-16.928,1.92L106.368,144.009H32c-17.632,0-32,14.368-32,32v128c0,17.664,14.368,32,32,32h74.368l155.616,124.512c2.912,2.304,6.464,3.488,10.016,3.488c2.368,0,4.736-0.544,6.944-1.6c5.536-2.656,9.056-8.256,9.056-14.4v-416C288,25.865,284.48,20.265,278.944,17.577z"/><path d="M368.992,126.857c-6.304-6.208-16.416-6.112-22.624,0.128c-6.208,6.304-6.144,16.416,0.128,22.656C370.688,173.513,384,205.609,384,240.009s-13.312,66.496-37.504,90.368c-6.272,6.176-6.336,16.32-0.128,22.624c3.136,3.168,7.264,4.736,11.36,4.736c4.064,0,8.128-1.536,11.264-4.64C399.328,323.241,416,283.049,416,240.009S399.328,156.777,368.992,126.857z"/><path d="M414.144,81.769c-6.304-6.24-16.416-6.176-22.656,0.096c-6.208,6.272-6.144,16.416,0.096,22.624C427.968,140.553,448,188.681,448,240.009s-20.032,99.424-56.416,135.488c-6.24,6.24-6.304,16.384-0.096,22.656c3.168,3.136,7.264,4.704,11.36,4.704c4.064,0,8.16-1.536,11.296-4.64C456.64,356.137,480,299.945,480,240.009S456.64,123.881,414.144,81.769z"/></svg>                <svg id="icon_volume_mute_' + randomID + '" style=\'display:none;\' fill="white"  enable-background="new 0 0 448.075 448.075" viewBox="0 0 448.075 448.075" xmlns="http://www.w3.org/2000/svg"><path d="m352.021 16.075c0-6.08-3.52-11.84-8.96-14.4-5.76-2.88-12.16-1.92-16.96 1.92l-141.76 112.96 167.68 167.68z"/><path d="m443.349 420.747-416-416c-6.24-6.24-16.384-6.24-22.624 0s-6.24 16.384 0 22.624l100.672 100.704h-9.376c-9.92 0-18.56 4.48-24.32 11.52-4.8 5.44-7.68 12.8-7.68 20.48v128c0 17.6 14.4 32 32 32h74.24l155.84 124.48c2.88 2.24 6.4 3.52 9.92 3.52 2.24 0 4.8-.64 7.04-1.6 5.44-2.56 8.96-8.32 8.96-14.4v-57.376l68.672 68.672c3.136 3.136 7.232 4.704 11.328 4.704s8.192-1.568 11.328-4.672c6.24-6.272 6.24-16.384 0-22.656z"/></svg>                </button>',
+                    opcional: !0,
+                    tooltip: this.i18n.mute
+                }, {
+                    name: "volume",
+                    element: "<input type='range' id='mooviegrid_volume_" + randomID + "' style='max-width:100px; min-width:50px;' name='volume' class='moovie_progress_sound' min=0 max='1' step='0.01' value='1'>",
+                    opcional: !0,
+                    tooltip: !1
+                }, {
+                    name: "subtitles",
+                    element: "<button id='moovie_subtitle_" + randomID + "' style='margin-left:5px' class='player__button'>                <svg class='opacity_svg' id='moovie_subtitle_svg_" + randomID + '\' version="1.1" fill=\'white\' xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="459px" height="459px" viewBox="0 0 459 459" style="enable-background:new 0 0 459 459;" xml:space="preserve"><g><g id="closed-caption"><path d="M408,25.5H51c-28.05,0-51,22.95-51,51v306c0,28.05,22.95,51,51,51h357c28.05,0,51-22.95,51-51v-306C459,48.45,436.05,25.5,408,25.5z M204,204h-38.25v-12.75h-51v76.5h51V255H204v25.5c0,15.3-10.2,25.5-25.5,25.5H102c-15.3,0-25.5-10.2-25.5-25.5v-102c0-15.3,10.2-25.5,25.5-25.5h76.5c15.3,0,25.5,10.2,25.5,25.5V204z M382.5,204h-38.25v-12.75h-51v76.5h51V255h38.25v25.5c0,15.3-10.2,25.5-25.5,25.5h-76.5c-15.3,0-25.5-10.2-25.5-25.5v-102c0-15.3,10.2-25.5,25.5-25.5H357c15.3,0,25.5,10.2,25.5,25.5V204z"/></g></g></svg>                </button>',
+                    opcional: !0,
+                    tooltip: this.i18n.subtitles
+                }, {
+                    name: "config",
+                    element: "<button id='moovie_el_cog_" + randomID + '\' class=\'player__button\'>                <svg version="1.1" fill="white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="25px" height="25.001px" viewBox="0 0 25 25.001" style="enable-background:new 0 0 25 25.001;" xml:space="preserve"><g><path d="M24.38,10.175l-2.231-0.268c-0.228-0.851-0.562-1.655-0.992-2.401l1.387-1.763c0.212-0.271,0.188-0.69-0.057-0.934l-2.299-2.3c-0.242-0.243-0.662-0.269-0.934-0.057l-1.766,1.389c-0.743-0.43-1.547-0.764-2.396-0.99L14.825,0.62C14.784,0.279,14.469,0,14.125,0h-3.252c-0.344,0-0.659,0.279-0.699,0.62L9.906,2.851c-0.85,0.227-1.655,0.562-2.398,0.991L5.743,2.455c-0.27-0.212-0.69-0.187-0.933,0.056L2.51,4.812C2.268,5.054,2.243,5.474,2.456,5.746L3.842,7.51c-0.43,0.744-0.764,1.549-0.991,2.4l-2.23,0.267C0.28,10.217,0,10.532,0,10.877v3.252c0,0.344,0.279,0.657,0.621,0.699l2.231,0.268c0.228,0.848,0.561,1.652,0.991,2.396l-1.386,1.766c-0.211,0.271-0.187,0.69,0.057,0.934l2.296,2.301c0.243,0.242,0.663,0.269,0.933,0.057l1.766-1.39c0.744,0.43,1.548,0.765,2.398,0.991l0.268,2.23c0.041,0.342,0.355,0.62,0.699,0.62h3.252c0.345,0,0.659-0.278,0.699-0.62l0.268-2.23c0.851-0.228,1.655-0.562,2.398-0.991l1.766,1.387c0.271,0.212,0.69,0.187,0.933-0.056l2.299-2.301c0.244-0.242,0.269-0.662,0.056-0.935l-1.388-1.764c0.431-0.744,0.764-1.548,0.992-2.397l2.23-0.268C24.721,14.785,25,14.473,25,14.127v-3.252C25.001,10.529,24.723,10.216,24.38,10.175z M12.501,18.75c-3.452,0-6.25-2.798-6.25-6.25s2.798-6.25,6.25-6.25s6.25,2.798,6.25,6.25S15.954,18.75,12.501,18.75z"/></g></svg>                </button>',
+                    opcional: !0,
+                    tooltip: this.i18n.config
+                }, {
+                    name: "fullscreen",
+                    element: "<button id='fullscreen_" + randomID + '\' class=\'player__button fullscreen_button\'>                    <svg version="1.1" fill="white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 215.35 215.35" style="enable-background:new 0 0 215.35 215.35;" xml:space="preserve"><g><path d="M7.5,65.088c4.143,0,7.5-3.358,7.5-7.5V25.61l48.305,48.295c1.465,1.464,3.384,2.196,5.303,2.196c1.92,0,3.84-0.732,5.304-2.197c2.929-2.929,2.929-7.678-0.001-10.606L25.604,15.002h31.985c4.142,0,7.5-3.358,7.5-7.5c0-4.142-3.357-7.5-7.5-7.5H7.5c-4.143,0-7.5,3.358-7.5,7.5v50.087C0,61.73,3.357,65.088,7.5,65.088z"/><path d="M207.85,150.262c-4.143,0-7.5,3.358-7.5,7.5v31.979l-49.792-49.792c-2.93-2.929-7.678-2.929-10.607,0c-2.929,2.929-2.929,7.678,0,10.606l49.791,49.791h-31.977c-4.143,0-7.5,3.358-7.5,7.5c0,4.142,3.357,7.5,7.5,7.5h50.086c4.143,0,7.5-3.358,7.5-7.5v-50.084C215.35,153.62,211.992,150.262,207.85,150.262z"/><path d="M64.792,139.949L15.005,189.74v-31.978c0-4.142-3.357-7.5-7.5-7.5s-7.5,3.358-7.5,7.5v50.086c0,4.142,3.357,7.5,7.5,7.5h50.084c4.142,0,7.5-3.358,7.5-7.5s-3.357-7.5-7.5-7.5H25.611l49.788-49.793c2.929-2.929,2.929-7.678-0.001-10.607C72.471,137.02,67.722,137.02,64.792,139.949z"/><path d="M207.85,0.002h-50.086c-4.143,0-7.5,3.358-7.5,7.5c0,4.142,3.357,7.5,7.5,7.5h31.979l-48.298,48.301c-2.929,2.929-2.929,7.678,0.001,10.607c1.464,1.464,3.384,2.196,5.303,2.196c1.919,0,3.839-0.733,5.304-2.197l48.298-48.301v31.98c0,4.142,3.357,7.5,7.5,7.5c4.143,0,7.5-3.358,7.5-7.5V7.502C215.35,3.359,211.992,0.002,207.85,0.002z"/></g></svg>                </button>',
+                    opcional: !0,
+                    tooltip: this.i18n.fullscreen
+                }, {
+                    name: "Main Submenu",
+                    element: "<div style='display:none;' class='moovie_submenu menuclosed' id='moovie_submenu_" + randomID + "'></div>",
+                    opcional: !1,
+                    tooltip: !1
+                }],
+                submenu = this.submenu = {
+                    mainSubmenu: {
+                        mainElement: "<ul id='moovie_submenu_main_" + randomID + "'></ul>",
+                        parentID: "moovie_submenu_main_",
+                        elements: [{
+                            name: "topic",
+                            element: "<li class='topic_submenu'>" + this.i18n.main_topic + "</li>",
+                            opcional: !1
+                        }, {
+                            name: "submenuCaptions",
+                            element: "<li id='this.moovie_el_topicCaption_" + randomID + "'><span>" + this.i18n.main_caption + "</span><span class='option_submenu' id='option_submenu_caption_" + randomID + "'>" + this.i18n.main_disabled + "</span></li>",
+                            opcional: !0
+                        }, {
+                            name: "submenuOffset",
+                            element: "<li id='moovie_el_capoffset_" + randomID + "'><span >" + this.i18n.main_offset + "</span><span class='option_submenu' id='option_submenu_range_" + randomID + "'>0s</span></li>",
+                            opcional: !0
+                        }, {
+                            name: "submenuSpeed",
+                            element: "<li id='topic_submenu_speed_" + randomID + "'><span>" + this.i18n.main_speed + "</span><span class='option_submenu' id='option_submenu_speed_" + randomID + "'>" + this.i18n.main_default + "</span></li>",
+                            opcional: !0
+                        }]
+                    },
+                    captionSubmenu: {
+                        mainElement: "<ul style='display:none;' id='moovie_submenu_captions_" + randomID + "'><input style='display:none;' type='file' id='localsub_" + randomID + "'><li class='topic_submenu'>" + this.i18n.caption_topic + "</li><li id='moovie_el_capback_" + randomID + "' style='font-weight:bold;'>" + this.i18n.caption_back + "</li></ul>",
+                        parentID: "moovie_submenu_captions_",
+                        elements: [{
+                            name: "allowLocalSubtitles",
+                            element: "<li id='locally_" + randomID + "' style='font-weight:bold;'>" + this.i18n.caption_load + "</li>",
+                            opcional: !0
+                        }]
+                    },
+                    rangeSubmenu: {
+                        mainElement: "<ul style='display:none; width:250px;' id='moovie_range_captions_" + randomID + "'><li class='topic_submenu'>" + this.i18n.offset_topic + "<output style='position:absolute; right:22px;' id='valoffset_" + randomID + "'>0</output></li><li class='topic_submenu'><span>-5s</span><span style='float: right;'>+5s</span><input type='range' oninput='valoffset_" + randomID + ".value = offset_range_input_" + randomID + ".value' id='offset_range_input_" + randomID + "' min='-5' max='5' step='0.2'></li>",
+                        parentID: "moovie_range_captions_"
+                    },
+                    speedSubmenu: {
+                        mainElement: "<ul style='display:none; width:250px;' id='moovie_range_speed_" + randomID + "'><li class='topic_submenu'>" + this.i18n.speed_topic + "<output style='position:absolute; right:22px;' id='valoffset_speed_" + randomID + "'>1</output></li><li class='topic_submenu'><span>0.1x</span><span style='float: right;'>8x</span><input type='range' value='1' oninput='valoffset_speed_" + randomID + ".value = offset_range_speed_" + randomID + ".value' id='offset_range_speed_" + randomID + "' min='0.1' max='8' step='0.1'></li>",
+                        parentID: "moovie_range_speed_"
+                    }
+                };
+            let captionchange = new CustomEvent("captionchange", {
+                    detail: this.events.captions,
+                    bubbles: !1,
+                    cancelable: !1,
+                    composed: !1
+                }),
+                offsetchange = new CustomEvent("offsetchange", {
+                    detail: this.events.offset,
+                    bubbles: !1,
+                    cancelable: !1
+                }),
+                togglecaption = new CustomEvent("togglecaption", {
+                    detail: this.events.captions,
+                    bubbles: !1,
+                    cancelable: !1
+                });
+            var togglecontrolpanel = new CustomEvent("togglecontrolpanel", {
+                detail: {
+                    show: !1
+                },
+                bubbles: !1,
+                cancelable: !1
+            });
+
+            function throttle(func, interval) {
+                var timeout;
+                return function() {
+                    var context = this,
+                        args = arguments,
+                        later = function() {
+                            timeout = !1
+                        };
+                    timeout || (func.apply(context, args), timeout = !0, setTimeout(later, interval))
+                }
+            }
+
+            function SetCurrentTime(currentT) {
+                _this.video.currentTime = currentT, _this.moovie_el_progressbar.value = currentT
+            }
+            var handleCustomEvents = this.handleCustomEvents = function handleCustomEvents() {
+                    for (var i = 0; i < customEvents.length; i++) {
+                        let toGo = customEvents[i].to,
+                            eventID = Math.floor(1e4 * Math.random()) + 0;
+                        if (customEvents[i].hasOwnProperty("fired") && customEvents[i].fired) video.currentTime > customEvents[i].endtime && (customEvents[i].fired = !1, document.getElementById("moovie_ce_" + customEvents[i].eventID).remove());
+                        else if (video.currentTime > customEvents[i].starttime && video.currentTime < customEvents[i].endtime) {
+                            Object.assign(customEvents[i], {
+                                fired: !0
+                            }), Object.assign(customEvents[i], {
+                                eventID: eventID
+                            }), moovie_el_video.insertAdjacentHTML("beforeend", "<div id='moovie_ce_" + eventID + "' class='moovie_cevent " + customEvents[i].position + " " + customEvents[i].class + "'>" + customEvents[i].content + "</div>");
+                            let eventElement = document.getElementById("moovie_ce_" + eventID);
+                            switch (customEvents[i].type) {
+                                case "skip":
+                                    customEvents[i].to <= video.duration && !isNaN(customEvents[i].to) && customEvents[i].to && eventElement.addEventListener("click", (function() {
+                                        SetCurrentTime(toGo)
+                                    }));
+                                    break;
+                                case "redirect":
+                                    customEvents[i].to && eventElement.addEventListener("click", (function() {
+                                        window.location.href = toGo
+                                    }));
+                                    break;
+                                case "function":
+                                    customEvents[i].to && eventElement.addEventListener("click", (function() {
+                                        toGo()
+                                    }));
+                                    break;
+                                default:
+                                    console.log("No action was added to this event")
+                            }
+                        }
+                    }
+                },
+                handleStorage = this.handleStorage = function handleStorage(order, variable, value) {
+                    switch (order) {
+                        case "set":
+                            localStorage.setItem(variable, value);
+                            break;
+                        case "get":
+                            break;
+                        case "setStorage":
+                            config.storage.captionOffset && (moovie_el_rinput.value = localStorage.getItem("captionOffset"), OffsetChange()), config.storage.playrateSpeed && (moovie_el_sinput.value = localStorage.getItem("playrateSpeed"), SpeedChange()), config.storage.captionSize && (document.getElementById("caption_track_" + randomID).style.fontSize = localStorage.getItem("captionSize") + "px")
+                    }
+                },
+                togglePlay = this.togglePlay = function togglePlay() {
+                    document.getElementById("poster_layer_" + randomID).style.backgroundImage = "none", 1 == video.paused ? (video.play(), document.getElementById("moovie_bplay_play_" + randomID).style.display = "none", document.getElementById("moovie_bplay_pause_" + randomID).style.display = "inherit", togglePoster("hide"), ChangeTooltip("play_button", 1)) : (video.pause(), document.getElementById("moovie_bplay_play_" + randomID).style.display = "inherit", document.getElementById("moovie_bplay_pause_" + randomID).style.display = "none", togglePoster("show"), ChangeTooltip("play_button", 0))
+                },
+                SetFullScreen = this.SetFullScreen = function SetFullScreen(order) {
+                    switch (order) {
+                        case "toggleFullscreen":
+                            moovie_el_player.requestFullscreen ? moovie_el_player.requestFullscreen() : moovie_el_player.webkitRequestFullscreen ? moovie_el_player.webkitRequestFullscreen() : moovie_el_player.msRequestFullscreen && moovie_el_player.msRequestFullscreen(), ChangeTooltip("fullscreen", 1), 1 >= outerHeight - innerHeight && (document.exitFullscreen ? document.exitFullscreen() : document.webkitExitFullscreen ? document.webkitExitFullscreen() : document.msExitFullscreen && document.msExitFullscreen(), ChangeTooltip("fullscreen", 0)), Submenu("CAll");
+                            break;
+                        case "checkFullscreen":
+                            1 >= outerHeight - innerHeight ? ChangeTooltip("fullscreen", 1) : ChangeTooltip("fullscreen", 0)
+                    }
+                };
+
+            function bufferedVideo() {
+                var canvasHandler = moovie_el_buffered.getContext("2d"),
+                    b = _this.video.buffered,
+                    i = b.length,
+                    w = moovie_el_buffered.width,
+                    h = moovie_el_buffered.height,
+                    vl = _this.video.duration,
+                    x1, x2;
+                for (canvasHandler.clearRect(0, 0, w, h), canvasHandler.fillStyle = "#e1e1dd"; i--;) x1 = b.start(i) / vl * w, x2 = b.end(i) / vl * w, canvasHandler.fillRect(x1, 0, x2 - x1, h);
+                setTimeout(bufferedVideo, 500)
+            }
+
+            function focusPlayer() {
+                video.focus()
+            }
+
+            function togglePoster(order) {
+                "show" == order ? (moovie_el_poster.style.display = "block", moovie_el_poster.classList.remove("posteroff"), moovie_el_poster.classList.add("posteron")) : "hide" == order && (moovie_el_poster.style.display = "none", moovie_el_poster.classList.remove("posteron"), moovie_el_poster.classList.add("posteroff"))
+            }
+
+            function skip() {
+                video.currentTime += parseFloat(this.dataset.skip)
+            }
+
+            function handleRangeUpdate() {
+                video[this.name] = this.value
+            }
+
+            function movieVideo(time, direction) {
+                switch (direction) {
+                    case "left":
+                        var vid_currentTime = video.currentTime;
+                        video.currentTime = vid_currentTime - time;
+                        var ncurrentTime = moovie_el_progress.value;
+                        moovie_el_progress.value = Number(ncurrentTime) - 5;
+                        break;
+                    case "right":
+                        var vid_currentTime = video.currentTime;
+                        video.currentTime = vid_currentTime + time;
+                        var ncurrentTime = moovie_el_progress.value;
+                        moovie_el_progress.value = Number(ncurrentTime) + 5
+                }
+            }
+
+            function calcSliderPos(e) {
+                return e.offsetX / e.target.clientWidth * parseInt(e.target.getAttribute("max"))
+            }
+
+            function cueTime(e) {
+                cuevalue = calcSliderPos(e).toFixed(2), moovie_el_cuetimer.style.opacity = "1", moovie_el_cuetimer.style.left = e.offsetX + "px", moovie_el_cuetimer.innerHTML = player_time(cuevalue)
+            }
+
+            function detectTouchScreen() {
+                var isMobile;
+                return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+            }
+
+            function androidOrIOS() {
+                const userAgent = navigator.userAgent;
+                return /android/i.test(userAgent) ? "android" : /iPad|iPhone|iPod/i.test(userAgent) ? "ios" : void 0
+            }
+
+            function player_time(secs) {
+                var t = new Date(1970, 0, 1);
+                t.setSeconds(secs);
+                var s = t.toTimeString().substr(0, 8);
+                return secs > 86399 && (s = Math.floor((t - Date.parse("1/1/70")) / 36e5) + s.substr(2)), secs < 3600 && (s = s.substring(3)), s
+            }
+
+            function updateTime() {
+                0 == moovie_ishiden && (document.getElementById("moovie_currentime_" + randomID).innerHTML = player_time(video.currentTime)), video.currentTime >= video.duration && (video.currentTime = 0, moovie_el_progress.value = 0, togglePlay())
+            }
+
+            function localSubtitles() {
+                const allowedFormats = [".vtt", ".srt"],
+                    toBase64 = file => new Promise((resolve, reject) => {
+                        const reader = new FileReader;
+                        reader.readAsDataURL(file), reader.onload = () => resolve(reader.result), reader.onerror = error => reject(error)
+                    });
+                let promise;
+                new Promise((async function(resolve, reject) {
+                    const file = document.querySelector("#localsub_" + randomID).files[0];
+                    var CheckFormat = file.name.substr(file.name.length - 4);
+                    if (allowedFormats.includes(CheckFormat)) {
+                        document.querySelectorAll("#moovie_submenu_captions_" + randomID + " .caption_track").forEach(item => {
+                            item.remove()
+                        });
+                        const CaptionSrc = await toBase64(file);
+                        let tname = file.name.substring(0, 10);
+                        document.getElementById(selector).insertAdjacentHTML("beforeend", "<track label='" + tname + "...' format='" + CheckFormat + "' srclang='Local' src='" + CaptionSrc + "'>"), resolve()
+                    } else console.log("Only .vtt and .srt formats are allowed.")
+                })).then((function() {
+                    GetCaptions(), console.log("Local caption added successfully.")
+                }))
+            }
+            var handleProgress = throttle((function() {
+                    if (bufferedVideo(), !video.paused) {
+                        var ncurrentTime = moovie_el_progress.value;
+                        moovie_el_progress.value = Number(ncurrentTime) + 1
+                    }
+                }), 1e3),
+                OffsetChange = this.OffsetChange = function OffsetChange() {
+                    offsettime = document.getElementById("offset_range_input_" + randomID).value, document.getElementById("option_submenu_range_" + randomID).innerHTML = offsettime + "s", document.getElementById("valoffset_" + randomID).value = offsettime, config.storage.captionOffset && handleStorage("set", "captionOffset", offsettime), _this.events.offset.value = offsettime, _this.video.dispatchEvent(offsetchange)
+                },
+                SpeedChange = this.SpeedChange = function SpeedChange() {
+                    speed = document.getElementById("offset_range_speed_" + randomID).value, document.getElementById("valoffset_speed_" + randomID).value = speed, document.getElementById("option_submenu_speed_" + randomID).innerHTML = 1 == speed ? _this.i18n.main_default : speed + "x", video.playbackRate = speed, config.storage.playrateSpeed && handleStorage("set", "playrateSpeed", speed)
+                };
+
+            function Scrub(e) {
+                if (detectTouchScreen()) {
+                    var offsetEvent;
+                    if (null == (offsetEvent = document.getElementById("range_progress_" + randomID).value)) {
+                        let scrubTime = (offsetEvent = e.touches[0].clientX) / moovie_elprogress.offsetWidth * video.duration;
+                        scrubTime >= video.duration && (scrubTime = video.duration), video.currentTime = scrubTime
+                    } else video.currentTime = offsetEvent
+                } else {
+                    var offsetEvent;
+                    let scrubTime = (offsetEvent = e.offsetX) / moovie_elprogress.offsetWidth * video.duration;
+                    scrubTime >= video.duration && (scrubTime = video.duration), video.currentTime = scrubTime
+                }
+            }
+
+            function ScrubSound(e) {
+                video.volume = moovie_ul_soundv.value, handleStorage("set", "scrubsound", video.volume), checkSoundLevel("checkMute")
+            }
+
+            function HideControls(order) {
+                "close" == order ? 0 == isopen && 0 == video.paused && (Submenu("CAll"), document.getElementById("moovie__controls_" + randomID).style.opacity = 0, document.getElementById("caption_track_" + randomID).style.marginBottom = "0px", togglecontrolpanel.detail.show = !1, _this.video.dispatchEvent(togglecontrolpanel)) : "open" == order && 1 == fullyloaded && (document.getElementById("caption_track_" + randomID).style.marginBottom = "40px", document.getElementById("moovie__controls_" + randomID).style.opacity = 1, togglecontrolpanel.detail.show = !0, _this.video.dispatchEvent(togglecontrolpanel))
+            }
+            var ChangeTooltip = _this.ChangeTooltip = function ChangeTooltip(elemName, defaultState) {
+                    let ele = _this.tooltips_menu[elemName].element;
+                    for (var toolText = 0, i = 0; i < _this.mainmenu.length; i++) _this.mainmenu[i].name == elemName && (toolText = _this.mainmenu[i].tooltip);
+                    if (toolText.indexOf("(") > -1) {
+                        var betweenBrackets = toolText.substring(toolText.lastIndexOf("(") + 1, toolText.lastIndexOf(")"));
+                        parts = betweenBrackets.split(":");
+                        var getNumBracketsString = toolText.replace(/\(.*\)/, "");
+                        getNumBracketsString = getNumBracketsString.replace(" ", "");
+                        var finalTooltip = parts[defaultState] + " " + getNumBracketsString
+                    }
+                    finalTooltip && (ele.innerText = finalTooltip);
+                    let calculatePos = ele.offsetWidth / 2 - 7;
+                    if (ele.style.marginLeft = "-" + calculatePos + "px", ele.offsetLeft + ele.offsetWidth >= _this.moovie_el_controlbar.offsetWidth) {
+                        let getOverflows = ele.offsetLeft + ele.offsetWidth - _this.moovie_el_controlbar.offsetWidth;
+                        getOverflows = calculatePos + getOverflows + 5, ele.style.marginLeft = "-" + getOverflows + "px"
+                    }
+                    ele.offsetLeft <= 0 && (ele.style.marginLeft = "-19px")
+                },
+                ActivateSubtitles = this.ActivateSubtitles = function ActivateSubtitles() {
+                    1 == hassubtitles ? 0 == subtitles ? (subtitles = 1, document.getElementById("moovie_subtitle_svg_" + randomID).classList.remove("opacity_svg"), ChangeTooltip("subtitles", 1), _this.events.captions.subtitles = !0) : 1 == subtitles && (subtitles = 0, document.getElementById("moovie_subtitle_svg_" + randomID).classList.add("opacity_svg"), ChangeTooltip("subtitles", 0), _this.events.captions.subtitles = !1) : console.log("You must choose an Subtitle first."), _this.video.dispatchEvent(togglecaption)
+                },
+                checkSoundLevel = this.checkSoundLevel = function checkSoundLevel(order) {
+                    switch (order) {
+                        case "checkMute":
+                            video.muted || 0 == video.volume ? (video.muted = !1, moovie_ul_soundv.value = localStorage.getItem("scrubsound"), video.volume = localStorage.getItem("scrubsound"), document.getElementById("icon_volume_unmute_" + randomID).style.display = "none", document.getElementById("icon_volume_mute_" + randomID).style.display = "inherit", ChangeTooltip("mute", 1)) : (document.getElementById("icon_volume_unmute_" + randomID).style.display = "inherit", document.getElementById("icon_volume_mute_" + randomID).style.display = "none", ChangeTooltip("mute", 0));
+                            break;
+                        case "toogleMute":
+                            1 == video.muted ? checkSoundLevel("unmutePlayer") : checkSoundLevel("mutePlayer");
+                            break;
+                        case "checkStorage":
+                            localStorage.getItem("scrubsound") ? (moovie_ul_soundv.value = localStorage.getItem("scrubsound"), video.volume = localStorage.getItem("scrubsound")) : (moovie_ul_soundv.value = "1", video.muted = !1, handleStorage("set", "scrubsound", 1)), checkSoundLevel("checkMute");
+                            break;
+                        case "mutePlayer":
+                            video.muted = !0, video.volume = 0, document.getElementById("icon_volume_unmute_" + randomID).style.display = "none", document.getElementById("icon_volume_mute_" + randomID).style.display = "inherit", document.getElementById("mooviegrid_volume_" + randomID).value = "0", ChangeTooltip("mute", 1);
+                            break;
+                        case "unmutePlayer":
+                            video.muted = !1, checkSoundLevel("checkMute"), localStorage.getItem("scrubsound") ? moovie_ul_soundv.value = localStorage.getItem("scrubsound") : moovie_ul_soundv.value = "1", ChangeTooltip("mute", 0), 0 != video.volume && (document.getElementById("icon_volume_unmute_" + randomID).style.display = "inherit"), document.getElementById("icon_volume_mute_" + randomID).style.display = "none"
+                    }
+                },
+                Submenu = this.Submenu = function Submenu(order) {
+                    switch (order) {
+                        case "toggleSubmenu":
+                            moovie_el_submain.style.display = "block", moovie_el_captions.style.display = "none", moovie_el_speed.style.display = "none", moovie_el_range.style.display = "none", moovie_el_submenu.classList.contains("menuclosed") ? (moovie_el_submenu.style.display = "block", moovie_el_submenu.classList.add("menuopen"), moovie_el_submenu.classList.remove("menuclosed"), isopen = 1) : (moovie_el_submenu.style.display = "none", moovie_el_submenu.classList.add("menuclosed"), moovie_el_submenu.classList.remove("menuopen"), isopen = 0);
+                            break;
+                        case "CAll":
+                            moovie_el_submain.style.display = "none", moovie_el_captions.style.display = "none", moovie_el_speed.style.display = "none", moovie_el_range.style.display = "none", moovie_el_submenu.classList.add("menuclosed"), isopen = 0;
+                            break;
+                        case "OCaption":
+                            moovie_el_submain.style.display = "none", moovie_el_captions.style.display = "block";
+                            break;
+                        case "CCaption":
+                            moovie_el_submain.style.display = "block", moovie_el_captions.style.display = "none";
+                            break;
+                        case "OSpeed":
+                            moovie_el_submain.style.display = "none", document.getElementById("moovie_range_speed_" + randomID).style.display = "block";
+                            break;
+                        case "ORange":
+                            moovie_el_submain.style.display = "none", document.getElementById("moovie_range_captions_" + randomID).style.display = "block"
+                    }
+                },
+                TransformPlayer = this.TransformPlayer = function TransformPlayer(caption) {
+                    var containerWidth;
+                    moovie_el_video.offsetWidth <= 460 ? (moovie_ishiden = 1, document.getElementById("moovie_el_current_" + randomID).style.display = "none", document.getElementById("moovie_moovie_el_progressbar_" + randomID).classList.add("responsive_bar"), moovie_el_cuetimer.classList.add("moovie_cuetime_small")) : (moovie_ishiden = 0, document.getElementById("moovie_el_current_" + randomID).style.display = "block", document.getElementById("moovie_moovie_el_progressbar_" + randomID).classList.remove("responsive_bar"), document.getElementById("moovie_fulltime_" + randomID).innerHTML = player_time(video.duration), moovie_el_cuetimer.classList.remove("moovie_cuetime_small"))
+                },
+                SetCaptionSize = this.SetCaptionSize = function SetCaptionSize(value) {
+                    const captionSize = document.getElementById("caption_track_" + randomID);
+                    var computedFontSize = window.getComputedStyle(captionSize).fontSize;
+                    if (value) "sizeUp" == value ? (computedFontSize = computedFontSize.slice(0, -2), computedFontSize = Number(computedFontSize) + Number(1), captionSize.style.fontSize = computedFontSize + "px") : "sizeDown" == value && (computedFontSize = computedFontSize.slice(0, -2), computedFontSize = Number(computedFontSize) - Number(1), captionSize.style.fontSize = computedFontSize + "px"), config.storage.captionSize && handleStorage("set", "captionSize", computedFontSize);
+                    else {
+                        var containerSize, fontSizeCap = .1 * moovie_el_video.offsetWidth;
+                        captionSize.style.fontSize = fontSizeCap + "%", captionSize.style.lineHeight = fontSizeCap / 3 + "px"
+                    }
+                },
+                PlayCaption = this.PlayCaption = function PlayCaption(caption) {
+                    function sec2time(timeInSeconds) {
+                        var pad = function(num, size) {
+                                return ("000" + num).slice(-1 * size)
+                            },
+                            time = parseFloat(timeInSeconds).toFixed(3),
+                            hours = Math.floor(time / 60 / 60),
+                            minutes = Math.floor(time / 60) % 60,
+                            seconds = Math.floor(time - 60 * minutes),
+                            milliseconds = time.slice(-3);
+                        return pad(hours, 2) + ":" + pad(minutes, 2) + ":" + pad(seconds, 2) + "." + pad(milliseconds, 3)
+                    }
+
+                    function RunCaption() {
+                        for (var i = 1; i < selectedCaption.length; i++)
+                            if (null != selectedCaption[i].starttime && null != selectedCaption[i].endtime) {
+                                var cap_starttime = selectedCaption[i].starttime,
+                                    cap_endtime = selectedCaption[i].endtime;
+                                if (offsettime >= 0) var RealcurrentTime = video.currentTime - offsettime;
+                                else var offsettimeBelow0 = String(offsettime).substring(1),
+                                    RealcurrentTime = video.currentTime + Number(offsettimeBelow0);
+                                (RealcurrentTime = sec2time(RealcurrentTime)) >= cap_starttime && RealcurrentTime <= cap_endtime && 1 == subtitles && (null != selectedCaption[i].text2 ? document.getElementById("caption_track_" + randomID).innerHTML = selectedCaption[i].text1 + "<br>" + selectedCaption[i].text2 : document.getElementById("caption_track_" + randomID).innerHTML = selectedCaption[i].text1), RealcurrentTime > cap_endtime && (document.getElementById("caption_track_" + randomID).innerHTML = "")
+                            }
+                    }
+                    selectedCaption = [];
+                    var request = new XMLHttpRequest;
+                    if (request.open("GET", caption.attributes.src.nodeValue, !0), caption.attributes.format) var capFormat = caption.attributes.src.nodeValue + caption.attributes.format.nodeValue;
+                    else var capFormat = caption.attributes.src.nodeValue;
+                    _this.events.captions.name = caption.attributes.label.nodeValue, request.onload = function() {
+                        if (this.status >= 200 && this.status < 400) {
+                            var resp = this.response;
+                            resp = resp.replace(/(\r\n|\r|\n)/g, "\n");
+                            var CheckFormat = capFormat.substr(capFormat.length - 4);
+                            ".srt" == CheckFormat && (resp = "STR\n\n" + resp), resp.split("\n\n").map((function(item) {
+                                var timeString, checkEmptyString, starttime, endtime, timeString, checkEmptyString, starttime, endtime;
+                                null != (parts = item.split("\n"))[1] ? isNaN(parts[0]) ? (checkEmptyString = (checkEmptyString = timeString = parts[0].replace(/-/g, "")).replace(/ /g, "")) && (".srt" == CheckFormat && (timeString = parts[0].replace(/,/g, ".")), starttime = (starttime = timeString.substr(0, timeString.indexOf(">"))).replace(/ /g, ""), endtime = (endtime = timeString.split(">", 2))[1].replace(/ /g, ""), starttime = starttime.replace(/--/g, ""), endtime = endtime.replace(/--/g, ""), ".srt" == CheckFormat && (endtime = endtime.replace(/,/g, "."), starttime = starttime.replace(/,/g, ".")), selectedCaption.push({
+                                    starttime: starttime,
+                                    endtime: endtime,
+                                    text1: parts[1],
+                                    text2: parts[2]
+                                })) : (checkEmptyString = (checkEmptyString = timeString = parts[1].replace(/-/g, "")).replace(/ /g, "")) && (starttime = (starttime = timeString.substr(0, timeString.indexOf(">"))).replace(/ /g, ""), endtime = (endtime = timeString.split(">", 2))[1].replace(/ /g, ""), ".srt" == CheckFormat && (endtime = endtime.replace(/,/g, "."), starttime = starttime.replace(/,/g, ".")), selectedCaption.push({
+                                    starttime: starttime,
+                                    endtime: endtime,
+                                    text1: parts[2],
+                                    text2: parts[3]
+                                })) : selectedCaption.push({
+                                    starttime: void 0,
+                                    endtime: void 0,
+                                    text1: void 0,
+                                    text2: void 0
+                                })
+                            }))
+                        }
+                    }, request.send(), video.addEventListener("timeupdate", RunCaption, !0), 1 == hassubtitles ? video.removeEventListener("timeupdate", RunCaption, !0) : (hassubtitles = 1, ActivateSubtitles()), _this.video.dispatchEvent(captionchange)
+                },
+                SetCaptions = this.SetCaptions = function SetCaptions(caption) {
+                    let CaptionFormat = caption.attributes.src.nodeValue.substr(caption.attributes.src.nodeValue.length - 4),
+                        capLabel = caption.track.label;
+                    var captionIDRandom = Math.floor(1e4 * Math.random()) + 0;
+                    caption.attributes.format && (CaptionFormat = caption.attributes.format.nodeValue), moovie_el_captions.insertAdjacentHTML("beforeend", "<li class='caption_track' id='captionid_" + captionIDRandom + "'><span>" + capLabel + "</span><span class='labelformat'>" + CaptionFormat + "</span></li>"), document.getElementById("captionid_" + captionIDRandom).addEventListener("click", (function() {
+                        PlayCaption(caption), document.getElementById("option_submenu_caption_" + randomID).innerHTML = capLabel, Submenu("toggleSubmenu")
+                    }))
+                },
+                GetCaptions = this.GetCaptions = function GetCaptions() {
+                    for (var vcaptions = document.getElementById(_this.selector).getElementsByTagName("track"), i = 0; i < vcaptions.length; i++) _this.SetCaptions(vcaptions[i])
+                },
+                Keybinds = this.Keybinds = function Keybinds() {
+                    const acceptedShortcuts = {
+                        keycode_32() {
+                            togglePlay()
+                        },
+                        keycode_75() {
+                            togglePlay()
+                        },
+                        keycode_70() {
+                            SetFullScreen("toggleFullscreen")
+                        },
+                        keycode_39() {
+                            movieVideo(5, "right")
+                        },
+                        keycode_37() {
+                            movieVideo(5, "left")
+                        },
+                        keycode_77() {
+                            checkSoundLevel("toogleMute")
+                        },
+                        keycode_67() {
+                            ActivateSubtitles()
+                        },
+                        keycode_shift87() {
+                            SetCaptionSize("sizeUp")
+                        },
+                        keycode_shift83() {
+                            SetCaptionSize("sizeDown")
+                        }
+                    };
+                    video.addEventListener("keydown", (function(event) {
+                        let ShortCut;
+                        (32 == event.keyCode || event.shiftKey && 87 == event.keyCode || event.shiftKey && 83 == event.keyCode) && event.preventDefault(), ShortCut = event.shiftKey ? acceptedShortcuts["keycode_shift" + event.keyCode] : acceptedShortcuts["keycode_" + event.keyCode], ShortCut && ShortCut()
+                    }))
+                },
+                SetupLogic = this.SetupLogic = function SetupLogic() {
+                    if (moovie_el_player = document.querySelector("#moovie__video_" + randomID), video = moovie_el_player.querySelector("#moovie_vid_" + randomID), this.video = video, video.addEventListener("loadedmetadata", e => {
+                            this.medialoading.style.display = "none", moovie_el_controls.style.opacity = 1, fullyloaded = 1, moovie_el_progress.setAttribute("max", video.duration), 0 == moovie_ishiden && (document.getElementById("moovie_fulltime_" + randomID).innerHTML = player_time(video.duration)), bufferedVideo(), handleStorage("setStorage"), checkSoundLevel("checkStorage")
+                        }), video.addEventListener("timeupdate", handleProgress), video.addEventListener("timeupdate", updateTime), video.addEventListener("timeupdate", handleCustomEvents), moovie_el_player.addEventListener("click", focusPlayer), (fullscreen = moovie_el_player.querySelector(".fullscreen_button")).addEventListener("click", (function() {
+                            SetFullScreen("toggleFullscreen")
+                        }), !0), document.addEventListener("fullscreenchange", (function() {
+                            SetFullScreen("checkFullscreen")
+                        }), !0), (moovie_el_toggle = moovie_el_player.querySelector(".toggle")).addEventListener("click", togglePlay), (ranges = moovie_el_player.querySelectorAll(".player__slider")).forEach(range => range.addEventListener("change", handleRangeUpdate)), this.moovie_el_rangeinput.addEventListener("change", OffsetChange), this.moovie_el_speedinput.addEventListener("change", SpeedChange), moovie_ul_soundv = document.getElementById("mooviegrid_volume_" + randomID), document.getElementById("mooviegrid_mute_" + randomID).addEventListener("click", (function() {
+                            checkSoundLevel("toogleMute")
+                        }), !1), moovie_elprogress = moovie_el_player.querySelector(".moovie_progress"), this.control_buttons.config.addEventListener("click", (function() {
+                            Submenu("toggleSubmenu")
+                        }), !0), this.moovie_el_topicCaption.addEventListener("click", (function() {
+                            Submenu("OCaption")
+                        }), !0), this.moovie_el_topicSpeed.addEventListener("click", (function() {
+                            Submenu("OSpeed")
+                        }), !0), this.moovie_el_capback.addEventListener("click", (function() {
+                            Submenu("CCaption")
+                        }), !0), this.control_buttons.subtitles.addEventListener("click", ActivateSubtitles), moovie_el_video.addEventListener("mouseleave", (function() {
+                            Submenu("CAll")
+                        }), !1), this.moovie_el_capoffset.addEventListener("click", (function() {
+                            Submenu("ORange")
+                        }), !0), detectTouchScreen()) {
+                        "ios" == androidOrIOS() && (this.moovie_el_volume.style.display = "none", fullscreen.style.display = "none", video.style.transformStyle = "preserve-3d"), moovie_el_progress.addEventListener("touchmove", (function(event) {
+                            Scrub(event), video.pause()
+                        })), moovie_el_progress.addEventListener("change", (function(event) {
+                            Scrub(event), video.pause() || togglePlay(), togglePoster("hide")
+                        }), !1), moovie_el_poster.addEventListener("touchend", (function(event) {
+                            video.pause() || togglePlay()
+                        })), moovie_ul_soundv.addEventListener("touchmove", (function(event) {
+                            ScrubSound(event)
+                        })), moovie_ul_soundv.addEventListener("change", (function(event) {
+                            ScrubSound(event)
+                        }), !1), moovie_el_locally.style.display = "none";
+                        var i = null;
+                        moovie_el_video.addEventListener("touchstart", e => {
+                            clearTimeout(i), HideControls("open"), i = setTimeout((function() {
+                                HideControls("close")
+                            }), 4e3)
+                        }), moovie_el_video.addEventListener("touchmove", e => {
+                            clearTimeout(i)
+                        }), moovie_el_video.addEventListener("touchend", e => {
+                            clearTimeout(i), i = setTimeout((function() {
+                                HideControls("close")
+                            }), 4e3)
+                        })
+                    } else {
+                        let mousedown = !1;
+                        moovie_elprogress.addEventListener("click", Scrub), moovie_elprogress.addEventListener("mousemove", e => mousedown && Scrub(e)), moovie_ul_soundv.addEventListener("click", ScrubSound);
+                        let mousedowns = !1;
+                        moovie_ul_soundv.addEventListener("mousemove", e => mousedowns && ScrubSound(e)), moovie_ul_soundv.addEventListener("mousedown", () => mousedowns = !0), moovie_ul_soundv.addEventListener("mouseup", () => mousedowns = !1), (moovie_el_poster = moovie_el_player.querySelector("#poster_layer_" + randomID)).addEventListener("click", togglePlay), video.addEventListener("click", togglePlay), moovie_el_locally.addEventListener("click", (function() {
+                            moovie_el_localsub.click()
+                        }), !0), moovie_el_localsub.addEventListener("change", localSubtitles), document.getElementById("range_progress_" + randomID).addEventListener("mousemove", (function(e) {
+                            cueTime(e)
+                        })), document.getElementById("range_progress_" + randomID).addEventListener("mouseleave", (function(e) {
+                            moovie_el_cuetimer.style.opacity = 0
+                        })), moovie_elprogress.addEventListener("mousedown", () => mousedown = !0), moovie_elprogress.addEventListener("mouseup", () => mousedown = !1), moovie_el_controls.addEventListener("mouseover", e => {
+                            isopen = 1
+                        }), moovie_el_controls.addEventListener("mouseleave", e => {
+                            isopen = 0
+                        }), moovie_el_progress.addEventListener("input", (function(event) {
+                            video.pause()
+                        }), !1), moovie_el_progress.addEventListener("change", (function(event) {
+                            togglePlay(), togglePoster("hide")
+                        }), !1), HideControls("close");
+                        var i = null;
+                        moovie_el_video.addEventListener("mousemove", e => {
+                            clearTimeout(i), HideControls("open"), i = setTimeout((function() {
+                                HideControls("close")
+                            }), 2e3)
+                        }), moovie_el_video.addEventListener("mouseleave", e => {
+                            clearTimeout(i), HideControls("close")
+                        })
+                    }
+                },
+                SetupMenu = this.SetupMenu = function SetupMenu() {
+                    for (var i = 0; i < mainmenu.length; i++) null != this.config.controls[mainmenu[i].name] && 1 == this.config.controls[mainmenu[i].name] || 0 == mainmenu[i].opcional ? moovie_el_controls.insertAdjacentHTML("beforeend", mainmenu[i].element) : moovie_el_controls.insertAdjacentHTML("beforeend", "<div style='display:none;'>" + mainmenu[i].element + "</div>");
+                    for (var tooltips_menu = this.tooltips_menu = [], i = 0; i < mainmenu.length; i++)
+                        if (mainmenu[i].tooltip) {
+                            let doc = (new DOMParser).parseFromString(mainmenu[i].element, "text/html");
+                            document.getElementById(doc.body.firstChild.id).insertAdjacentHTML("beforeend", "<div id='moovie_" + mainmenu[i].name + "_tooltip_" + randomID + "' class='moovie_tooltip'>" + mainmenu[i].tooltip + "</div>");
+                            let targetNode = document.getElementById(doc.body.firstChild.id),
+                                targetNodeTool = document.getElementById("moovie_" + mainmenu[i].name + "_tooltip_" + randomID);
+                            tooltips_menu[mainmenu[i].name] = {
+                                element: targetNodeTool
+                            }, this.ChangeTooltip(mainmenu[i].name, 0)
+                        }
+                    moovie_el_submenu = document.getElementById("moovie_submenu_" + randomID);
+                    for (let key in submenu)
+                        if (moovie_el_submenu.insertAdjacentHTML("beforeend", submenu[key].mainElement), submenu[key].hasOwnProperty("elements"))
+                            for (var i = 0; i < submenu[key].elements.length; i++) null != this.config.controls[submenu[key].elements[i].name] && 1 == this.config.controls[submenu[key].elements[i].name] || 0 == submenu[key].elements[i].opcional ? document.getElementById(submenu[key].parentID + randomID).insertAdjacentHTML("beforeend", submenu[key].elements[i].element) : document.getElementById(submenu[key].parentID + randomID).insertAdjacentHTML("beforeend", "<div style='display:none;'>" + submenu[key].elements[i].element);
+                    moovie_el_progress = document.getElementById("range_progress_" + randomID), moovie_el_captions = document.getElementById("moovie_submenu_captions_" + randomID), moovie_el_range = document.getElementById("moovie_range_captions_" + randomID), moovie_el_speed = document.getElementById("moovie_range_speed_" + randomID), this.moovie_el_topicCaption = document.getElementById("this.moovie_el_topicCaption_" + randomID), this.moovie_el_topicSpeed = document.getElementById("topic_submenu_speed_" + randomID), this.moovie_el_capback = document.getElementById("moovie_el_capback_" + randomID), this.moovie_el_capoffset = document.getElementById("moovie_el_capoffset_" + randomID), this.moovie_el_speedinput = moovie_el_sinput = document.getElementById("offset_range_speed_" + randomID), this.moovie_el_rangeinput = moovie_el_rinput = document.getElementById("offset_range_input_" + randomID), this.moovie_el_progressbar = moovie_el_progress, this.moovie_el_volume = moovie_el_volume = document.getElementById("mooviegrid_volume_" + randomID), this.moovie_el_cuetimer = moovie_el_cuetimer = document.getElementById("moovie_cue_timer_" + randomID), this.moovie_el_submenuBase = moovie_el_submenu, this.moovie_el_localsub = moovie_el_localsub = document.getElementById("localsub_" + randomID), this.moovie_el_locally = moovie_el_locally = document.getElementById("locally_" + randomID), this.moovie_el_submain = moovie_el_submain = document.getElementById("moovie_submenu_main_" + randomID), this.moovie_el_buffered = moovie_el_buffered = document.getElementById("moovie_buffered_" + randomID), this.control_buttons = {
+                        play: this.moovie_el_play = moovie_el_play = document.getElementById("tooglebutton_" + randomID),
+                        mute: this.moovie_el_mute = moovie_el_mute = document.getElementById("mooviegrid_mute_" + randomID),
+                        subtitles: this.moovie_el_subtitles = moovie_el_subtitles = document.getElementById("moovie_subtitle_" + randomID),
+                        config: this.moovie_el_cog = document.getElementById("moovie_el_cog_" + randomID),
+                        fullscreen: this.moovie_el_fullscreen = moovie_el_fullscreen = document.getElementById("fullscreen_" + randomID)
+                    }
+                },
+                SetupPlayer = this.SetupPlayer = function SetupPlayer() {
+                    var vsource = this.element.getAttribute("src");
+                    null == vsource && null != this.element.getElementsByTagName("source")[0] ? vsource = this.element.getElementsByTagName("source")[0].src : console.log("No video source found. Read documentation to a add video source dynamically.");
+                    var vposter = document.getElementById(this.selector).getAttribute("poster");
+                    this.element.style.display = "none", this.element.insertAdjacentHTML("afterend", "<div style='width:" + dimensions.width + "' id='moovie__video_" + randomID + "' class='moovie'></div>"), this.moovie_el_video = moovie_el_video = document.getElementById("moovie__video_" + randomID), moovie_el_video.insertAdjacentHTML("beforeend", "<video tabindex='1' id='moovie_vid_" + randomID + "' preload='auto' class='player__video viewer' style='width:100%; height:100%;' src='" + vsource + "' playsinline></video>"), moovie_el_video.insertAdjacentHTML("beforeend", "<div style='opacity:0;' id='moovie__controls_" + randomID + "' class='moovie_controls'></div>"), this.moovie_el_controlbar = moovie_el_controls = document.getElementById("moovie__controls_" + randomID), moovie_el_video.insertAdjacentHTML("afterbegin", "<div id='medialoading_" + randomID + "' class='loadingv'><div class='loading animated fadeIn'><div class='moovie_bg'></div></div></div><div class='poster_layer posteron' id='poster_layer_" + randomID + "'></div>"), this.medialoading = document.getElementById("medialoading_" + randomID), this.moovie_el_poster = moovie_el_poster = document.getElementById("poster_layer_" + randomID), moovie_el_poster.insertAdjacentHTML("afterbegin", "<div class='poster_center' id='poster_center_" + randomID + "' style=''></div>"), document.getElementById("poster_center_" + randomID).insertAdjacentHTML("afterbegin", '<div class=\'poster_button\'>            <svg version="1.1" style=\'width:25px;height:25px;\' fill="white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="163.861px" height="163.861px" viewBox="0 0 163.861 163.861" style="enable-background:new 0 0 163.861 163.861;" xml:space="preserve"><g><path d="M34.857,3.613C20.084-4.861,8.107,2.081,8.107,19.106v125.637c0,17.042,11.977,23.975,26.75,15.509L144.67,97.275c14.778-8.477,14.778-22.211,0-30.686L34.857,3.613z"/></g></svg>            </div>'), null != vposter && (moovie_el_poster.style.backgroundImage = "url(" + vposter + ")", moovie_el_poster.style.backgroundSize = "100%", moovie_el_poster.style.backgroundPositionY = "center"), moovie_el_video.insertAdjacentHTML("beforeend", "<div class='moovie_captionspot caption_size'><p class='moovie_caption' id='caption_track_" + randomID + "'></p></div>"), this.SetupMenu(), this.SetupLogic(), this.GetCaptions(), this.Keybinds(), SetCaptionSize(), TransformPlayer()
+                };
+            this.SetupPlayer();
+            var ResizeWindow = throttle((function() {
+                SetCaptionSize(), TransformPlayer()
+            }), 100);
+            window.addEventListener("resize", ResizeWindow)
+        }
+        togglePlay() {
+            this.togglePlay()
+        }
+        toggleSubtitles() {
+            this.ActivateSubtitles()
+        }
+        toggleFullscreen() {
+            this.SetFullScreen("toggleFullscreen")
+        }
+        destroy() {
+            this.moovie_el_video.remove()
+        }
+        build() {
+            this.SetupPlayer()
+        }
+        addTrack(properties) {
+            function onComplete(callback) {
+                "function" == typeof callback && callback()
+            }
+            if (properties.options && "object" == typeof properties.options) {
+                for (var prop = Object.keys(properties.options).length, i = 0; i < prop; i++) {
+                    var addlabel, srclang, tracksrc;
+                    addlabel = properties.options[i].label ? "label='" + properties.options[i].label + "'" : "label='New Subtitle'", srclang = properties.options[i].srclang ? "srclang='" + properties.options[i].srclang + "'" : "srclang='New'", (tracksrc = properties.options[i].src ? "src='" + properties.options[i].src + "'" : "") ? document.getElementById(this.selector).insertAdjacentHTML("beforeend", "<track " + addlabel + " " + srclang + " " + tracksrc + ">") : console.log("Error, 'src' can not be empty.")
+                }
+                document.querySelectorAll("#moovie_submenu_captions_" + this.randomID + " .caption_track").forEach(item => {
+                    item.remove()
+                }), this.GetCaptions(), "function" == typeof properties.onComplete && onComplete(properties.onComplete)
+            } else console.error("Options must be and Object. Read documentation.")
+        }
+        change(properties) {
+            function onComplete(callback) {
+                "function" == typeof callback && callback()
+            }
+            properties.video && "object" == typeof properties.video ? (properties.video.videoSrc && (this.video.pause(), this.video.src = properties.video.videoSrc), properties.video.posterSrc && (this.element.setAttribute("poster", properties.video.posterSrc), this.moovie_el_poster.style.backgroundImage = "url(" + properties.video.posterSrc + ")"), properties.captions && "object" == typeof properties.captions && properties.captions.clearCaptions && document.querySelectorAll("#moovie_submenu_captions_" + this.randomID + " .caption_track").forEach(item => {
+                item.remove()
+            }), "function" == typeof properties.onComplete && onComplete(properties.onComplete)) : console.error("Options must be and Object. Read documentation.")
+        }
+        get playerElement() {
+            return this.video
+        }
+        get playing() {
+            return Boolean(this.video.ready && !this.video.paused && !this.video.ended)
+        }
+        get paused() {
+            return Boolean(this.video.paused)
+        }
+        get stopped() {
+            return Boolean(this.video.paused && 0 === this.video.currentTime)
+        }
+        get ended() {
+            return Boolean(this.video.ended)
+        }
+        get duration() {
+            const Duration = parseFloat(this.video.duration),
+                realDuration = (this.video.media || {}).duration,
+                duration = realDuration || realDuration === 1 / 0 ? 0 : realDuration;
+            return Duration || duration
+        }
+        get seeking() {
+            return Boolean(this.video.seeking)
+        }
+        get currentTime() {
+            return Number(this.video.currentTime)
+        }
+        get volume() {
+            return this.video.volume
+        }
+        get muted() {
+            return Boolean(this.video.muted)
+        }
+        get speed() {
+            return Number(this.video.playbackRate)
+        }
+        get minimumSpeed() {
+            return .1
+        }
+        get maximumSpeed() {
+            return 8
+        }
+        get minimumOffset() {
+            return -5
+        }
+        get maximumOffset() {
+            return 5
+        }
+        get source() {
+            return this.video.currentSrc
+        }
+        get captionOffset() {
+            return this.moovie_el_rangeinput.value
+        }
+        set currentTime(input) {
+            this.video.currentTime = input, this.moovie_el_progressbar.value = input
+        }
+        set volume(input) {
+            this.video.volume = input, this.moovie_el_volume.value = input, this.checkSoundLevel("checkMute")
+        }
+        set speed(input) {
+            if (input < -.1 || input > 8) return "Value must be between -0.1 and 8";
+            this.video.playbackRate = input, this.moovie_el_speedinput.value = input, this.SpeedChange()
+        }
+        set captionOffset(input) {
+            if (input < -5 || input > 5) return "Value must be between -5 and 5";
+            this.moovie_el_rangeinput.value = input, this.OffsetChange()
+        }
+        set source(input) {
+            this.video.pause(), this.video.src = input, this.video.play()
+        }
+        set muted(input) {
+            input ? this.checkSoundLevel("mutePlayer") : this.checkSoundLevel("unmutePlayer")
+        }
+    }
+    try {
+        module.exports = exports = Moovie
+    } catch (e) {}
+</script>
+
+<!-- Moovie.playlist.js -->
+<script>
+    //Moovie.playlist.js
+    class _Moovie_Playlist {
+        constructor(options) {
+            const defaults = {
+                reference: "defaultId",
+                dimensions: {
+                    width: "240px",
+                    height: "100%"
+                },
+                sources: [{
+                    src: !1,
+                    title: !1
+                }]
+            };
+            this.reference = options.reference || defaults.reference, this.sources = options.sources || defaults.sources, this.dimensions = options.dimensions || defaults.dimensions;
+            var mooviePlayer = this.reference,
+                loopSrc = 0,
+                sources = this.sources,
+                InitModule = this.InitModule = function InitModule() {
+                    const listStyle = `\n                .moovie_play_list {\n                    z-index: 3;\n                    right: calc(25px - ${this.dimensions.width});\n                    top: 0px;\n                    position: absolute;\n                    height: 100%;\n                    width: ${this.dimensions.width};\n                    display: flex;\n                    justify-content: center;\n                    flex-direction: column;\n                    transition: transform 250ms,opacity .2s ease-in-out;\n                }\n                .moovie_play_list.show {\n                    transform: translateX(calc(25px - ${this.dimensions.width}));\n                }\n                .moovie_play_list_content {\n                    width: 100%;\n                    height: ${this.dimensions.height};\n                    display: flex;\n                    align-items: center;\n                }\n\n                .moovie_play_list_arrow {\n                    width: 25px;\n                    height: 100px;\n                    background: var(--moovie_bg_controls);\n                    font-weight:900;\n                    color:white;\n                    border-radius:20px 0px 0px 20px;\n                    text-align:center;\n                    line-height:100px;\n                }\n                .moovie_play_list_arrow p{\n                    transition: transform 250ms;\n                }\n                .moovie_play_list_arrow.show p{\n                    transform:rotate(180deg);\n                }\n\n\n                .moovie_play_list_table_item{\n                    color:white;\n                    padding:5px 10px 5px 10px;\n                }\n                .moovie_play_list_table_item:hover{\n                    background:rgb(134 141 152 / 74%);\n                }\n                .moovie_play_list_table_item.selected{\n                    color:var(--moovie_main_color);\n                }\n            `,
+                        style = document.createElement("style");
+                    style.type = "text/css", style.innerHTML = listStyle, document.getElementsByTagName("head")[0].appendChild(style), mooviePlayer.moovie_el_video.insertAdjacentHTML("beforeend", "<div id='moovie_play_list_" + mooviePlayer.randomID + "' class='moovie_play_list'><div id='moovie_play_list_content_" + mooviePlayer.randomID + "' class='moovie_play_list_content'><div id='moovie_play_list_arrow_" + mooviePlayer.randomID + "' class='moovie_play_list_arrow'><p><</p></div><div id='moovie_play_list_table_" + mooviePlayer.randomID + "' style='height: 100%;background: var(--moovie_bg_controls);flex: 1;padding:10px 0px 10px 0px;overflow:auto;border-radius:5px 0px 0px 5px;'></div></div></div>");
+                    let listElement = document.getElementById("moovie_play_list_" + mooviePlayer.randomID);
+                    mooviePlayer.video.addEventListener("togglecontrolpanel", (function(evt) {
+                        evt.detail.show ? listElement.style.opacity = 1 : listElement.style.opacity = 0
+                    }));
+                    var arrowElement = document.getElementById("moovie_play_list_arrow_" + mooviePlayer.randomID);
+                    arrowElement.addEventListener("click", (function() {
+                        let list = document.getElementById("moovie_play_list_" + mooviePlayer.randomID);
+                        list.classList.contains("show") ? (list.classList.remove("show"), arrowElement.classList.remove("show")) : (list.classList.add("show"), arrowElement.classList.add("show"))
+                    }));
+                    var listTable = document.getElementById("moovie_play_list_table_" + mooviePlayer.randomID);
+                    for (let index = 0; index < this.sources.length; index++) {
+                        const element = this.sources[index];
+                        let item = document.createElement("div");
+                        item.classList.add("moovie_play_list_table_item"), item.innerText = element.title, item.addEventListener("click", (function() {
+                            itemOnClick(index)
+                        })), mooviePlayer.video.src === element.src && (item.classList.add("selected"), loopSrc = index), listTable.appendChild(item)
+                    }
+
+                    function itemOnClick(index) {
+                        loopSrc !== index && playAtIndex(index)
+                    }
+
+                    function nextLoopSrc() {
+                        let targetIndex = loopSrc + 1;
+                        return targetIndex >= sources.length && (targetIndex = 0), targetIndex
+                    }
+
+                    function playAtIndex(index) {
+                        mooviePlayer.video.src == sources[index].src ? (mooviePlayer.video.currentTime = 0, mooviePlayer.medialoading.style.display = "none", mooviePlayer.moovie_el_controlbar.style.opacity = 1) : (mooviePlayer.video.src = sources[index].src, mooviePlayer.video.addEventListener("loadedmetadata", (function() {
+                            mooviePlayer.medialoading.style.display = "none", mooviePlayer.moovie_el_controlbar.style.opacity = 1, mooviePlayer.video.play()
+                        }), !0), listTable.children[index].classList.add("selected"), listTable.children[loopSrc].classList.remove("selected"), loopSrc = index)
+                    }
+                    mooviePlayer.video.addEventListener("ended", (function() {
+                        mooviePlayer.medialoading.style.display = "block", mooviePlayer.moovie_el_controlbar.style.opacity = 0, setTimeout((function() {
+                            playAtIndex(nextLoopSrc()), console.log("Now playing: " + sources[loopSrc].title)
+                        }), 100)
+                    }), !0)
+                };
+            this.InitModule()
         }
     }
 </script>
