@@ -9,6 +9,9 @@
     <script src="jsscript/popper.min.js"></script>
     <script src="jsscript/bootstrap.min.js"></script>
 
+    <script src="../Documents/GitHub/moovie/js/moovie.js"></script>
+    <script src="../Documents/GitHub/moovie/js/plugins/playlist/playlist.js"></script>
+
     <!-- moovie.css -->
     <style>
          :root {
@@ -718,6 +721,11 @@
 
 </body>
 
+<script src="//cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+    eruda.init();
+</script>
+
 <script>
     var jsonObj
     var deepObjArr
@@ -1040,7 +1048,7 @@
             path = obj["Name"];
         }
 
-        var url = downloadJsonUrl + "?filePath=" + path;
+        var url = downloadJsonUrl + "?filePath=" + btoa(path);
         if (preview) {
             if (obj["IsDir"]) {
                 showFailed("Dir could not preview.")
@@ -1593,7 +1601,7 @@
 
         var requestUrl = remoteDownloadUrl + "?url=" + btoa(url);
         if (name.length > 0) {
-            requestUrl += "&filename=" + name;
+            requestUrl += "&filename=" + btoa(name);
         }
 
         xhttp.open("GET", requestUrl, true);
@@ -1929,6 +1937,25 @@
         document.body.removeChild(previewer)
     }
 
+
+
+    //video css funtion
+    const videoCssStyle = `
+        #video-previewer:-webkit-full-screen {
+            width: 100%;
+            height: 100%;
+            background-color: black;
+        }
+        #video-previewer:-webkit-full-screen video {
+            width: 100%;
+        }
+    `;
+    const videoStyle = document.createElement('style');
+    videoStyle.type = 'text/css';
+    videoStyle.innerHTML = videoCssStyle;
+    document.getElementsByTagName('head')[0].appendChild(videoStyle);
+
+
     function previewWithVideo(url) {
         let previewer = document.createElement("div")
 
@@ -1962,8 +1989,8 @@
                                 <div style=\"z-index:11;position: absolute;top: -60px;right: -60px;width: 120px;color: white;border-radius: 100%;height: 120px;text-align: left;vertical-align: bottom;background: #0000007a;margin: 0 auto;\" onclick=\"closePreviewer(this)\">\
                                     <div style='bottom: 0px;position: absolute;width: 60px;height: 60px;line-height: 50px;text-align: center;padding-left: 10px;font-size: 25px;font-weight: 500;'>X</div>\
                                     </div>\
-                                <video id=\"video-previewer\">\
-                                    <source src=" + url + " type='video/mp4'>\
+                                <video id=\"video-previewer\" mediagroup=\"masterController\">\
+                                    <source src=" + encodeURI(url) + " type='video/mp4'>\
                                     Your browser does not support the video tag.\
                                 </video>\
                             </div>"
@@ -2015,7 +2042,7 @@
             path = obj["Name"];
         }
 
-        var url = downloadJsonUrl + "?filePath=" + path;
+        var url = downloadJsonUrl + "?filePath=" + btoa(path);
         if (preview) {
             if (obj["IsDir"]) {
                 return null
@@ -2032,7 +2059,7 @@
 </script>
 
 <!-- Moovie.js -->
-<script>
+<!-- <script>
     //Moovie.js
     class Moovie {
         constructor(options) {
@@ -2830,10 +2857,10 @@
     try {
         module.exports = exports = Moovie
     } catch (e) {}
-</script>
+</script> -->
 
 <!-- Moovie.playlist.js -->
-<script>
+<!-- <script>
     //Moovie.playlist.js
     class _Moovie_Playlist {
         constructor(options) {
@@ -2897,6 +2924,6 @@
             this.InitModule()
         }
     }
-</script>
+</script> -->
 
 </html>
