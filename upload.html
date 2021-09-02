@@ -1011,7 +1011,10 @@
                     jsonObj = JSON.parse(this.responseText);
                     var ele = document.getElementById("dir-size-value");
                     ele.innerText = formatBytes(jsonObj["used"]) + " / " + formatBytes(jsonObj["max"])
-                    ele.style.color = hsl_col_perc(jsonObj["used"] / jsonObj["max"], 120, 360)
+                    if (jsonObj["used"] >= jsonObj["max"]) {
+                        ele.innerText = ele.innerText + "(FULL)"
+                    }
+                    ele.style.color = hsl_col_perc(Math.min(jsonObj["used"] / jsonObj["max"], 1) * 100, 120, 360)
                 } else {
                     showFailed(this.responseText);
                 }
