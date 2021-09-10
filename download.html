@@ -11,6 +11,7 @@
 
     <script src="../Documents/GitHub/moovie/js/moovie.js"></script>
     <script src="../Documents/GitHub/moovie/js/plugins/playlist/playlist.js"></script>
+    <script src="jsscript/qrcode.js"></script>
 
     <!-- moovie.css -->
     <style>
@@ -719,6 +720,8 @@
         </div>
     </div>
 
+    <div id="qrcode"></div>
+
 </body>
 
 <script src="//cdn.jsdelivr.net/npm/eruda"></script>
@@ -1048,7 +1051,7 @@
             path = obj["Name"];
         }
 
-        var url = downloadJsonUrl + "?filePath=" + btoa(path);
+        var url = downloadJsonUrl + "?filePath=" + btoa(toBinary(path));
         if (preview) {
             if (obj["IsDir"]) {
                 showFailed("Dir could not preview.")
@@ -1087,6 +1090,8 @@
         downloadFileWithObj(caller, obj, true)
     }
 
+    // var qrcodeGenerator = null;
+    // var qrcodeElement = null;
 
     function sharedAction(caller, obj) {
         event.cancelBubble = true;
@@ -1102,20 +1107,37 @@
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4) {
                 var title = "";
-                var content = "";
+                let contentEle = null;
+                let isHtml = false;
                 if (this.status == 200) {
                     title = "Shared Success";
-                    content = sharedUrl + '/' + this.responseText;
+                    let content = sharedUrl + '/' + this.responseText;
+                    contentEle = document.createElement("div")
+                    let qrcodeElement = document.createElement("div")
+                    qrcodeElement.style.textAlign = "-webkit-center";
+                    let qrcodeGenerator = new QRCode(qrcodeElement, {
+                        text: content,
+                        width: 168,
+                        height: 168,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                    contentEle.append(content)
+                    contentEle.appendChild(qrcodeElement)
+
+                    isHtml = true;
                 } else {
                     title = "Shared Failed";
-                    content = this.responseText;
+                    contentEle = this.responseText;
                 }
 
                 $(caller).popover({
                     "container": 'body',
                     "title": title,
-                    "content": content,
-                    "placement": "top"
+                    "content": contentEle,
+                    "placement": "top",
+                    "html": isHtml
                 }).popover("show");
                 curPopoverObj = caller;
             }
@@ -1129,7 +1151,7 @@
             path = obj["Name"];
         }
 
-        var url = sharedUrl + "?filePath=" + path;
+        var url = sharedUrl + "?filePath=" + btoa(toBinary(path));
 
         xhttp.open("GET", url, true);
 
@@ -1309,6 +1331,34 @@
             if (sameObj) return true;
         }
         return false;
+    }
+
+    // convert a Unicode string to a string in which
+    // each 16-bit unit occupies only one byte
+    function toBinary(string) {
+        const codeUnits = new Uint16Array(string.length);
+        for (let i = 0; i < codeUnits.length; i++) {
+            codeUnits[i] = string.charCodeAt(i);
+        }
+        const charCodes = new Uint8Array(codeUnits.buffer);
+        let result = '';
+        for (let i = 0; i < charCodes.byteLength; i++) {
+            result += String.fromCharCode(charCodes[i]);
+        }
+        return result;
+    }
+
+    function fromBinary(binary) {
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < bytes.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        const charCodes = new Uint16Array(bytes.buffer);
+        let result = '';
+        for (let i = 0; i < charCodes.length; i++) {
+            result += String.fromCharCode(charCodes[i]);
+        }
+        return result;
     }
 
 
@@ -1599,9 +1649,9 @@
             }
         };
 
-        var requestUrl = remoteDownloadUrl + "?url=" + btoa(url);
+        var requestUrl = remoteDownloadUrl + "?url=" + btoa(toBinary(url));
         if (name.length > 0) {
-            requestUrl += "&filename=" + btoa(name);
+            requestUrl += "&filename=" + btoa(toBinary(name));
         }
 
         xhttp.open("GET", requestUrl, true);
@@ -2042,7 +2092,7 @@
             path = obj["Name"];
         }
 
-        var url = downloadJsonUrl + "?filePath=" + btoa(path);
+        var url = downloadJsonUrl + "?filePath=" + btoa(toBinary(path));
         if (preview) {
             if (obj["IsDir"]) {
                 return null
