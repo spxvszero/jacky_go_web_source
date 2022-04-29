@@ -849,7 +849,7 @@
             }
 
             //更新文件大小信息
-            updateDirSize()
+            checkUploadSize()
 
         } else {
             uploadFailed(evt, taskId)
@@ -1024,12 +1024,15 @@
 
         xhttp.send();
     }
-    if (config_uploadMaxSizeUrl && config_uploadMaxSizeUrl.length > 0) {
-        updateDirSize();
-    } else {
-        document.getElementById("dir-size").style.display = 'none';
-    }
 
+    function checkUploadSize() {
+        if (config_uploadMaxSizeUrl && config_uploadMaxSizeUrl.length > 0) {
+            updateDirSize();
+        } else {
+            document.getElementById("dir-size").style.display = 'none';
+        }
+    }
+    checkUploadSize();
 
     //toast function
     const showToastAnime = `

@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="jsscript/arpc.js"></script>
+    <script src="jsscript/chartist/chartist.js"></script>
+    <link rel="stylesheet" href="jsscript/chartist/chartist.css"></link>
+    <title>Document</title>
+    <!-- basic -->
+    <style>
+        /* basic */
+        
+        .dialog {
+            position: fixed;
+            z-index: 9998;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-color: #0000;
+            text-align: center;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+        
+        .dialog.show {
+            opacity: 1;
+        }
+    </style>
+
+    <!-- panel -->
+    <style>
+        /* panel */
+        
+        .status {
+            background-color: lightgray;
+            width: 15px;
+            height: 15px;
+            border-radius: 7.5px;
+            margin: 5px 5px 5px 0px;
+        }
+        
+        .status.online {
+            background-color: rgb(23, 233, 23);
+        }
+        
+        .control-bar {
+            position: sticky;
+            position: -webkit-sticky;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            height: 50px;
+            background: black;
+            display: flex;
+            z-index: 10;
+        }
+        
+        .pin-icon-logo {
+            border: none;
+            background: black;
+            color: white;
+            font-size: 50px;
+        }
+        
+        .pin-icon-logo:hover {
+            background: #525252;
+        }
+        
+        .pin-icon-button {
+            border: none;
+            background: black;
+            color: white;
+            font-size: 15px;
+            margin-left: 8px;
+        }
+        
+        .pin-icon-button:hover {
+            background: #525252;
+        }
+        
+        .card-sort:focus {
+            outline: none;
+        }
+        
+        .cards-area {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .card-wrap {
+            align-content: space-around;
+            width: 420px;
+        }
+        
+        .card {
+            border-radius: 3px;
+            border-width: 1px;
+            border-color: gray;
+            box-shadow: 0px 0px 4px 0px rgba(51, 51, 51, 0.521);
+            /* max-width: 240px; */
+            margin: 10px;
+        }
+        
+        .card-content {
+            padding: 10px 10px 10px 10px;
+        }
+        
+        .card-top {
+            display: flex;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            padding-bottom: 10px;
+            align-items: center;
+            border-bottom: 2px outset white;
+        }
+        
+        .card-title {
+            font-size: 24px;
+            font-weight: 800;
+        }
+        
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: baseline;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        
+        .card-body .icon {
+            display: inline-block;
+            align-self: center;
+            width: 32px;
+            margin: 0px 10px 0px 0px;
+        }
+        
+        .card-body-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-bottom {
+            display: flex;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            flex-direction: column;
+        }
+        
+        .card-bottom-item {
+            display: inline-flex;
+            flex-grow: 1;
+            flex-basis: 0;
+        }
+        
+        .card-bottom-item-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: space-around;
+            flex-direction: column;
+        }
+        
+        .card-bottom-item-container-canvas {
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .card-bottom-item-container-list {
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s;
+            transform-origin: 0% 50%;
+        }
+        
+        .card-bottom-item-container-list:hover {
+            background-color: #ccc;
+        }
+        
+        .card-bottom-item-container-list-icon {
+            display: inline-block;
+            align-self: center;
+            width: 32px;
+            margin: 0px 10px 0px 0px;
+        }
+        
+        .cart-network {
+            display: flex;
+            font-weight: 600;
+            font-size: 15px;
+            flex-direction: column;
+            justify-content: space-around;
+            gap: 10px;
+            padding: 10px 0px 10px 0px;
+        }
+        
+        .mem-icon {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+        
+        .mem-icon-cover {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            object-fit: none;
+            object-position: left;
+            height: 100%;
+        }
+        
+        .disk-icon {
+            position: relative;
+            width: 64px;
+            height: 64px;
+        }
+        
+        .disk-icon-back {
+            opacity: 20%;
+        }
+        
+        .disk-icon-cover {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            object-fit: none;
+            object-position: left;
+            height: 100%;
+        }
+        
+        .card-info-item-hover {
+            transform: scale(1.1, 1.1);
+        }
+        
+        #card-info-chart {
+            width: 150px;
+            height: 150px;
+            transition: transform 0.3s;
+            background-color: lightblue;
+        }
+        /* #card-info-chart:hover {
+            transform: scale(1.5, 1.5);
+        } */
+        
+        .traffice-icon {
+            position: relative;
+            width: 24px;
+            height: 24px;
+        }
+        
+        .back-shadow {
+            left: 0px;
+            background-color: #00000054;
+            position: fixed;
+            overflow: auto;
+            top: 0px;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .back-shadow.show {
+            opacity: 1;
+        }
+    </style>
+
+    <!-- config Server -->
+    <style>
+        /* config Server */
+        
+        .form-back {
+            display: flex;
+        }
+        
+        .form-item {
+            margin: 10px 0px 10px 0px;
+            flex-grow: 1;
+        }
+        
+        .form-item-content {
+            background: white;
+        }
+        
+        .form-form {}
+        
+        .form-header {
+            font-weight: bold;
+            padding-left: 10px;
+        }
+        
+        .form-group {
+            margin: 10px;
+            font-size: 15px;
+            color: black;
+            font-weight: 500;
+            display: grid;
+        }
+        
+        .form-footer {
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .form-footer button {
+            padding: 10px;
+            font-size: 14px;
+            background: none;
+            border: none;
+            width: 100%;
+        }
+        
+        .form-footer button:hover {
+            background: #ccc;
+        }
+        
+        .default-button {
+            padding: 10px;
+            font-size: 14px;
+            background: none;
+        }
+        
+        .default-button:hover {
+            background: #ccc;
+        }
+        
+        .form-control {
+            margin-bottom: 10px;
+        }
+        
+        input {
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        input:focus {
+            border-color: #525252;
+            outline: 0;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(179, 179, 179, 0.6);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(179, 179, 179, 0.6)
+        }
+    </style>
+
+    <style>
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 150%;
+            left: 50%;
+            margin-left: -60px;
+        }
+        
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: black transparent transparent transparent;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="control-bar" class="control-bar">
+    </div>
+    <!-- <div id="cardArea-0" class="cards-area">
+        <div id="card-${numberID}" class="card">
+            <div class="card-content">
+                <div class="card-top">
+                    <div id="card-status-${numberID}" class="status"></div>
+                    <div id="card-name-${numberID}" class="card-title">{{ Name }}</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-body-item">
+                        <img id="card-icon-system-${numberID}" class="icon" src="data:image/png;base64,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
+"></img><span id="card-info-system-${numberID}"> {{ SystemOS }} {{ SystemFamily }} {{ SystemVersion }}</span>
+                    </div>
+                    <div class="card-body-item">
+                        <img id="card-icon-kernel-${numberID}" class="icon" src="icon/cpu.png"></img><span id="card-info-kernel-${numberID}"> {{ KernelArch }} {{ KernelVersion }}</span>
+                    </div>
+                    <div class="card-body-item">
+                        <img id="card-icon-virtual-${numberID}" class="icon" src="icon/cpu.png"></img><span id="card-info-virtual-${numberID}"> {{ Virtualization }} {{ VirtualizationRole }}</span>
+                    </div>
+                    <div class="card-body-item">
+                        <img id="card-icon-uptime-${numberID}" class="icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAQAAADa613fAAAMQklEQVR42u3beXCV9bkH8M97zskGhISEsAVlk7oiokgVRUHRKlVRaLV1pqh1qdaljha9Imi9dZ3OQIvjHa94vei0el2QeqszYl3piF5Qi4IFEURkEwOEkOWcnOQk9w+OISEnm5wgzPC8/2Qy57zn/f6e5/t9lt/v5aAdtIN20A5aOi0QEjrwIYR1V6xIxoEMY6Dzne9JS73ml3rLOTA9k2mmFTYqUy2u0lvudIK8Aw9MF3+0Ta2EhHr16iVs8QdDDrQwy3SzKgkJdUkg9erV+qdxMgUHEkeOs1JUVG0TKHU2OkPWgeSTLD/xtg22q94DyiJHH1gB1tWP3OkL1SpUqlOvTp06MY/rL3JgMaXY82Jq7VQpIaFGnYRS9+h5YClYhjOtlVCnRlytGnXqJGxyjW77B+kDETny9dbfAAMUK9JdlnCjxwsUuce2BgGuFk/Kca1lTv0+wyuQqcAQxzvdBab4jbs8ZJZZHnSHq/zYSAPlyxISUuAhlY1oHhNXk/w7arbc7yO8Atn6OckUD3nREl/4xk5VqsXVqBEXtcN6iz3lJqc7VKFr7GykVzViSTGuk1Djff32LZCQLgYZ77eet8J2MbUSSQWqb3bVqbHDJx53qxWNPrHTJjvVJj9TodY6/fcVkEBYodPMsMA6FeJJAPVtXnWqfZMU3Xp1Skw3w8eqkmTfotIX+0a5AmF5xpvjM+UNENoH41swdRISohaZLF8PZ3peVK1qJVa7W/a+CKdsR7jPSpWNAinV1RacmIXOly8kkGO4ud6xxFJzFHe2/IZkKHKJ1+1QkwSRkFCbJPTX1ltvky222q5MRQOJU/ulzJNGyhYgLN9hzjHRkM4V30BYdyd5xJeiyTK8VlyFTZb4s2kucbaxxhrvXBeY7Oeudqe5PlLWULLvee3wiCOSDx4SliWjc9kRkmWoOy21U1ytWnGVvvSS201wjL66CDcBnSFbN4UGOs3tFtrZgpJtNlXvfaVRYd2dab5vxNSoUa3Mx2Y6R3/ZAoGI7BYCIhBR4GT3+pd4CigJS5wjZ19oVIa+brRUubi4mB2WesAP5SV9EMhxqkucLKsFkgYy9TXJy42y+e6r0sMGdLZPQrIc7T9sEBUXV2G5+42S16hyCin2gDUe16sZkLCMJNyQXKM9K5oivJY5p3MFN6Sbs7yiVLW4mC2eMU7PPeYeIX3MtNpjCvcAEnaksx3dyHNj/SMF8Xe6S8/Ok9ywApf5QIW4uCor3WmQrs5yj6JGUAJZjjPRUSJNHibQxwsWeVSXhv/0cLOtzYDU+qsjOiu4wnqb6vNkSJV52yT5wrJd4W8GN/nZXVPDUDN/XmerzaY2onLEiRY20686nxgrs3Ng9HGPr8TUqFbiz0YmAyrsaGfo3mYgBI6xwk5PGdykD+ljplgzn2x0aYPf0gqjn/ttFFMjZqM/GNxoVBNu0iK1ZN08Zb7Lm43eurpGaTMgpW6Wn26WhBW5y8Ykwde5S789or89dpuLm5F/V7d+oU3NgJS7O910D+nhBl+KiYsps8xUeWn8iQwTrE+RSx7UO51AQnJNsVJUXNQXNii3xvg0TpuyTU7hkTQDCeSY4COVqlVZ6XbviIqak8Z01c3VDUOH3VeF3ylKH5AMJ3jdTtWqrHCNXsZ40ud+2agg3NulKnS3ihRV8K16pAtISLE5toqqsNRlegiJ6Kp7i6kqJCKjQ0IQONQTKYrHLS7XLV1rletGX6pQZrFJrTx+45p4mHFGpFSnlr4zwtspCvrVJqRrgJ1pjP9TapuFztOtDRiBDEPc7X1rrfFWG8kskJ8MnGwTrU1RNr7nxPT0hRGDPW2LEguM06XNFc5wpCdsVm6nDa5rYzUzzDZLjkCBacpT1FrP7FH07EUmf9B627xrjJw2YAQihnpKiaiobV52RBtiEHG6C2QIOdy85ASrqWbd1YHwbAVGX/dZZ4c1rmyTchG9nGi2jSpV2eplZyTHB61/K4Js51mVorX60uS97xFDCt1unQrbzFXc5tqONt9mUVVKLXefo9oBo/HguiJFs7vA8L0V+ECOS3ymUqXlzlLYZIjQ/NMDLW6YES50th4dEN+I472Zoq0q9/sUvWWHSX6MN1WK2eFPznGrGxo6ulRBeHGjVvVV+R0gaKC7X/kmhWJ96sd7WzkEct1tm2pRy11ghjf93XUtDhHCrm6UzF7TvUNMPNK85NZB03njnL1XrIjhloiJKzPLYW7xV++6tkUgIeNsbtgKmNZm9gg3PGAg1+U2pvDH5y7Wde/5cbNt4mI+MUZXw03xs1bWJ+RQL9qhWqn5hrZK0ECR0Y5K3iviKC+k8EeVRw3eW6KH9fWSSnFl7pcvJCxHdiu3zTTBh9b7h8va/PmQYR7x77IRKHCDLSn88ZFz9154M4yySlTMcifJQCBoRT1CepqrRIm/6NXmKgaKnGG0sEC2sd5NoVfbTE/HuDTLpUrElHtMYTtul2mcVcp947Z2DQq+5UiGwz2uqhmMuPlG7H3LFujqXmVitvpFO+QvpMBspSqscloHRjdh/dyRUnZXuDgdG9EhBZ5XIeoLo9rxYBlOtkyFMs92IBxCCl1hVYrCvdTvFaejUIwY4D1Voj40RKRVdhDoYpoSFTa04L9U3w/JM8mSFGVi3HzHp2ckl2GE1WKqvKFYvmI9W4nXQIEXbVfqFYNSED0iW+Ye6xuS61xvpegHE5a6KF3nGzJNsEW1KvMc7lIzXO+YFpubQC/vKvGZS5sViYEso0xxkb6NoIR0d7YFqlOwY6Nb0rW5E8h2kzJxleY62e/8t/91YStFfE+LfWZGCn0L6eM/feA9UxtOLITkOdeCFMPRejvNNjRd+4SBfI+pUqPKo04wzTyz/KgVWc3zpmkKUjKh2BwrrfdacqM/rNBkb6fwRr1q841qd+nfDjUZ6B3VakU96hBnuMKFBraS5ga6t4XeMdDVpV63xkf6CcvQ31U+SLnRVmuRCek8/RMYaZUaCTFzFcnRQ7dWs3Wo1T6lm2EmukKWroa7x5qU+7gJn/qFgnTuhATG+1qthGrPKk7D/SIydVVskhdsb2EHd62b9EnbsC9pF9guoU7cSwY2WfdIGysWTkHUQKZexnighb3benXWu8Mh6T8MMMmOJJBXDGnILcVOMabVxjPkLJc3Gv8EwnL0M9bvvK+8hXMOdTa4y6DOONOw2yMLHJZMasd51kYVHm5C66Y5O+w0lydzeyBTviNMNts/WwRRr85XphvUOSdIx9ukVkLcG4YipLfnRSXEPdZoRyQsV26TlQzLFAjrotipfmOetWKtHKJJWOM2A2R0zr7tcEvFJcS963CBDCdaq1ZCmVsbZo1hg0w3x8hGUAIZST/M9J5tKSqppoL7qRs68xBskSdUqRW33HBhGY61SpVSrzi2QVkixnjFW65PBlNIliIjXesZn6tq8zBTtfddpne6lapprTXJV+LiNpsoU0iun7rPzYY12viMGO45i/1KtrAcxU73b161uQVtasqMcn9zvoLOhLGrQvqLSnHlHlYoJJCt2x4DukA3Y/3aD+QZ4jwPWmR7G8H0LTM2esTozj8vGsg00VpRMatcmNSpoFllG5Gr2AmmmGOZ8hZPXjX1RaX33OQH6aup2vLJfykVVealZlORQFi2QoebYLqXrWtVmZo2TWs8Yrye32FT+zs3V6dYaKsSy5pstIRk6WGos9ziacvtaFcw7dKorz3n5wbtG180bmDP86JFnkh6JCRTnkHGutGTltom3u7TowmlXvNrR8vtXHq3NG0cZIQBsmXJN9g4N5rrI1s7AGHXwePFphvVofl8mqFEZCsw1Nl+62kfd8gL3w6i/2WmM/XurOzd3vnWMa71P1YoU9NBCPXi1pnrJwbsW1Y0V64efuplJd8Bwi5qz3elI9vcBe50y3Olle3I0qlAlHjVTUbI/75Ysdu6uNZX7UpxzUH83VQn6fl9smJ3WP3Rx+1Oc7s5sdmrphqt9/7z3mAXN9jQbo8kVFrtOdf7oV7728uPea7y6R7vA6aCELXJQrP8zDAF++MbnCE9TPSMtSqbvalZp1bMdqu94U+udIpD5X7/xG4ttw820QxPes1iy6yw0qc+9LZ5ZrvFRUY6RF6zIfV+CCWsi14GG2akk4x2ipOd6FhD9VegS2e/CpF+QCHhhmvXkeTgQHqf+aAdtIN20A7aQTto+7v9P7rDF88osK1bAAAAAElFTkSuQmCC
+"></img><span id="card-info-uptime-${numberID}"> {{ StartupTime }}</span>
+                    </div>
+                </div>
+                <div class="card-bottom">
+                    <div class="card-bottom-item">
+                        <div class="card-bottom-item-container">
+                            <div id="card-bottom-item-cpu-${numberID}" class="card-cpu card-bottom-item-container-list" onclick="chartOfType(${numberID},'cpu')">
+                                <img id="card-icon-virtual-${numberID}" class="card-bottom-item-container-list-icon" src="data:image/png;base64,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
+"></img>
+                                <div id="card-info-cpu-${numberID}">{{ CPUUsage }} %</div>
+                            </div>
+                            <div id="card-bottom-item-mem-${numberID}" class="card-mem card-bottom-item-container-list">
+                                <img class="card-bottom-item-container-list-icon" id="card-img-mem-${numberID}" src="icon/cpu_cover.png" />
+                                <div id="card-info-mem-${numberID}">{{ MemTotal }} {{ MemUsage }}%</div>
+                            </div>
+                            <div id="card-bottom-item-swap-${numberID}" class="card-mem card-bottom-item-container-list">
+                                <img class="card-bottom-item-container-list-icon" id="card-img-mem-swap-${numberID}" src="icon/cpu.png" />
+                                <div id="card-info-mem-swap-${numberID}">{{ SwapTotal }} {{ SwapUsage }}%</div>
+                            </div>
+                            <div id="card-bottom-item-disk-${numberID}" class="card-disk card-bottom-item-container-list">
+                                <img class="card-bottom-item-container-list-icon" id="card-img-disk-${numberID}" src="icon/cpu.png" />
+                                <div id="card-info-disk-${numberID}">{{ DiskUsed }} / {{ DiskTotal }}</div>
+                            </div>
+                        </div>
+                        <div class="card-bottom-item-container-canvas">
+                            <canvas id="card-info-chart-${numberID}" width="160px" height="160px">
+                        </div>
+                    </div>
+                    <div class="card-bottom-item">
+                        <div class="card-bottom-item-container">
+                            <div class="cart-network">
+                                <div>
+                                    <img class="traffice-icon" src="data:image/png;base64,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
+" />
+                                    <span id="card-info-traffic-month-send-${numberID}">{{ TrafficSentMonth }}</span>
+                                    <div></div>
+                                    <img class="traffice-icon" src="data:image/png;base64,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
+" />
+                                    <span id="card-info-traffic-month-recv-${numberID}">{{ TrafficRecvMonth }}</span>
+
+                                </div>
+                                <br>
+                                <div>
+                                    <img class="traffice-icon" src="data:image/png;base64,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
+" />
+                                    <span id="card-info-traffic-total-send-${numberID}">{{ TrafficSentTotal }}</span>
+                                    <div></div>
+                                    <img class="traffice-icon" src="data:image/png;base64,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
+" />
+                                    <span id="card-info-traffic-total-recv-${numberID}">{{ TrafficRecvTotal }}</span>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="card-bottom-item-container">
+                            <div>
+                                <img class="traffice-icon" src="data:image/png;base64,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
+    " />
+                                <span id="card-info-traffic-send-${numberID}">{{ TrafficSent }}</span>
+                                <div></div>
+                                <img class="traffice-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAQAAADa613fAAAJs0lEQVR4Ae3B26+dZV4A4Of3fmut3X3qiVJa2gFKKVBb6IC0FBgPoEbEBHE0HjLqjRdmTLzwwmv/Aq+8MTExE+8m8cLJTOIQjMYhk4GBtnIaKC20pWWm9Nzddh/W4XvNcrFm7VU2k2Htz92Y7OexatWqVatWrVq1atWqZQk/W6hcoXq3uV/DjKWFLXbJbqhUoWrhQc+ZdErLUiY96RlXfCyrUKFaYdKvesEWZ53VcbMxD/kjB1z2rqYKFapV2OWrvmKrpg9dkS1W2OYFL9im5X3nlCqTVGuNvR623hZP2GeNYQ27fcU26+z2iHEVSqo1ZZft6hp22G3asEn3u9+Ymi0etFaFaqo1YbNpCWttNWXYuC02SJi02ZQKJdVqmFBHaJg0ZljDlIaumgljKlRTraQmCSR1NcMKDYVAUleoUFKtkISukIQwEEIIXSGECiXVCgMhDAuhL1SqplpZV+gJw0LoCpVLqhUIPSGEgRDC/5GkaqEnhCQMhCSEvlChpFoh9CVJWCwJfSFUKKlWkoSepJAMJIVC6ApJUqGkSiGEnpAUwkAoJH1JEiqTVCkkSehJCmGxQqEnhCRUJqlSKCR9hZowEAqFviQJlUmqFApJX6EQBkJNIfQkhaQySZVCEkJXSGrCQCgUekJIQmWSKoUQ+pJkWFLoC0moTDKqED4rSfqSEBYLIfSEsJQwkmQ0hV+wXTIshJ9fCMOSO3xZYQTJaOqe9qxtam4WQk92syzLekIIixU2+zXPGTOCmlGEcV+yV8N3ndbUF8JAlmWLZdnnqdvq1/2OcybMyb6gmlGEdTZ5xEYN/+ojHT1ZNpBlN8uWVtjsWX/iPq9Y77KOLygZRZg2bcoeX/VLNghLy4Zlw7KeMO1xf2CfaVPWCV9YMpqammTcXr9ltzHLU7fTcx41oVCoy76wZBSlpnkdYcp+B90mLCX8PMI6+z1lWlKatyD7wpJRZNd8Yk5ItnjcTnU9YSDcLISBELpq7vKE7RIWnDOj9IUlo7nqA5eUwhp7PWydrhBCX0jCYiH0hdAzaY9HjAvZVcdcMoJkNLPec0YbyZ0ec5earjAQwmIhSULoCYHCnfa7S0LbWW+7bgTJaNpOOGpGxriHPWQKISQ9IUmGhaQnhNA14UGPmUQ267j3tY0gGU12zpvOKlG422O2KRAWS8JiyUAIIdlsv50KZBf8t5/IRpCMatbbjpvXNe1Re00IIfSFYYEwbNwDDlinq+mUI24YSTKqjpPeclGJwk773SnJsp4sy4ZlWV9Gcrv9dqshu+Itx7WNJBndZUec1EZYb7+HjCtlfaWObCDr6Mgysqw05kFP2ijQ9mOvu2BEyeia3vWOGRk1DzhoKzp6sraWbCBra+vLsk0O2qOO7IZ3vWnBiJLRlX7ikDM6QtjgcXvVlbKelqbSQKmpKevpKNzvSZuEUPrE684ojShZjllv+JFZWai53wG368i6spYFHQOlppaerLTefnvVkc1732uuG1myHB0nve7HOkg2OOABhVKW0bKgY6C0oCkjy8I9nnSbJJTOe91xbSNLlmfGIe+Zl1Gzyz7TSl1ZR0tpoNTSlnWVxu21Rx3Zgg+86oplSJan7bhDzikR1nvQ7Tp6SqVsICuVejo22GOjQHbJYT/SsgzJ8mSXvOaoBRmFrW4XMrIsG5ZlWVdY70tquppO+IELsmVIlqvpPYdclBEmTUl6smxYlnVlyaQpgdIVR7xpwbIky5Wd95pjmjKSMXVdWZbdLMsyCmMKXS2nvOKsbFmS5VvwtsMuywiFQujKsmFZqSsUagLZjDccMW+ZkuUrfeKHPtCSkYSurKM0rNRR6gpJV8tpP/Cx0jIlVZjzliOu6AkhK7WVhmVtWVfoyq570yGzli2pQuljr/pQS9ZXaukIA6HU0kHoafvYG86rQFKNWUccclnWEzrmtQ1rm9cWerJrmv7Y3/lNdctUU42O0162zzpjQlfLrKZhLTe0ZIGs5RN3mrDDXY47rrQMSVVuOOT7zitlZPOuWjCs5apZPaXLLphUM+5+v2uNny0Z0/C5kqqUPvYfDrsuI7viE/OGLTjvohKlOe8KhY6mCc9bL/l8yWZf87wpn6NQnY4rCndaJ5l32ItO6Bg2ZZd7JLOOesljNrjhurWmfM8ZHT0hGVZ3wN/6FR84obSEQpWazptVmHfCi77vqmxYW8M617zjO476PWNOm7FV3RmvaurZ5Hk3XDFQt9vX3Kbh3y1YAYX19njaU7ar+6y6rQ56xj7b/YXLrvmmb1mw4CWbJF11v+8V/2S9gYaDzpl11E6FJdRUq+OqGUdRKn1WyyfOI5v2i2o6fugeJA+4w1UlCne42+12OayjJ7ukpbDJDmd0fEZStazU1lZaWqmtrdSwR5hzxEeyZIP7FLqSrGG9fRr6sqYFYY371CwhuTWSTbbhnI+ck9HwZYWuUFdTd5+agY62ULhbsoTk1qh50JTSe667oCMUHtGQEKYUClskA1mJ5A5hCcmt0XBQXelVCy5rIuyyVkJYK0nWCgMhBKaEJSS3RsOjkjmvabpmAWGzLRLCtCSZFG4WapaU3AqFTXbgglPa5szqmnKXQJgUwpjFkqSrsKTkVqjZYx2OuqZjzgxCzU5JYFIgIfSEQk1XtqTkVmh4Sl3H6+rWaLmgK9mtJkmmdZUWq6nrmpMtoWblhXEHFG6o+yvXveWCLIRdJs2r2SAwL8t6kkljQumybAk1K6+w3d2Y8afW4poFPVttdMUa64TSNVlf2GQM2XnZEpKV1/C4tTjmuJaW074tI6y1UTJpStclWV+yVR3ZOdkSalbemGfUdLzk32zHSU/oKLDGeoVpawQuyvqSL0konVdaQs1KK2zysOS6V53wIcJOTQ0UpoSNGsganjap46RjSjsldMwYN640p6X0UzUrre5htwtnndJSou6CGyaFUJdsVEPhD/25NbILvuUb7pWE5Lf9hgkz3vCyj5U+VbPSGp42JnvHDaWu7KKLNsvIkrWShO16tvszl2wXwoS/FEI270V/7ZTsfyUrK5l0QNLxiqae0lUfKtF2XVYIi4VJ95oQupJAGPesXxY+layswjbbhVmHtfVk8152Q8s5H2k6Y042kF11zIxsWGFM+FSysmruNi4546S2nqzpO/7Th77pA02HfNuMjlKpbc6H/sG/+K55i5Xe8orSp2pWVtZ2Hf/lqlJfxzFfN+mCGdlZf+Of3WtMx6zLPnDCrL9XesEWdbRc9D3/6H3Zp8LKKuzwdXXf8Ka2gRBCVupKErJS1pesda8d1stmnHbSJS0/FVZaYQJz2v7fC2HVqlUr7H8ASGcRmKN8s4MAAAAASUVORK5CYII=
+    " />
+                                <span id="card-info-traffic-recv-${numberID}">{{ TrafficRecv }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+
+    <div id="cardArea" class="cards-area"></div>
+
+    <div id="shadow" class="back-shadow" style="display: none;">
+        <div id="shadow-content">
+
+        </div>
+    </div>
+
+</body>
+
+<script>
+    //for canvas
+    //cpu, mem, swap, disk
+    var startAngle = -0.5 * Math.PI + 0.1 * Math.PI; // about 20 
+    var statusRadiusArr = [70, 50, 35, 15]
+    var curSelectedChartIndex = -1;
+    var curSelectedRadiusIndex = -1;
+    var normalLineWidth = 10,
+        selectedLineWidth = 14;
+    var tmpMapForPercentage = new Map
+
+    //---------
+
+    //Main
+    var mode = false
+    var sortValue = "none"
+    var cardTotal = 0
+        //{AccessKey,ExpiredTime}
+    var curClientAccessKey
+
+    var curClient
+        //main mode server list [server]
+    var serverLists
+        //main mode server info list [serverInfo]
+    var serverAddressIdentifyLists
+        //main mode server info list {identify : server}
+    var serverListsInfos
+        //{address : indexOfServerInfo}
+    var serverListsAddressIndexMap = new Map
+        //{address : webClient}
+    var serverListsAddressClients
+        //sorted server info list
+    var sortedServerListsInfos
+        //server token {serverIdentify:token}
+    var serverTokenInfo = new Map
+
+    //---------
+
+    //Error Code    
+    const RSP_SUC = 100
+    const RSP_FAIL_NOT_CONFIG = 102
+
+    //---------
+
+    //API
+    let API_BroadcastPublicAuth = "/broadcast/public"
+    let API_BroadcastPublicPinInfo = "/broadcast/public/pininfo"
+    let API_BroadcastPublicAuthRemove = "/broadcast/public/remove"
+
+    let API_BroadcastAuth = "/broadcast/auth"
+    let API_BroadcastPinInfo = "/broadcast/auth/pininfo"
+
+    let API_AuthToken = "/auth/token"
+    let API_AuthTokenRemote = "/auth/obtain/other"
+
+    let API_ConfigServer = "/config"
+    let API_AddNewServer = "/auth/addserver"
+    let API_ConfigRemoteServer = "/config/remote"
+    let API_Servers = "/auth/servers"
+    let API_AddressIdentifyServer = "/auth/identify/servers"
+
+    let API_CHART_CPU = "/chart/cpu"
+
+    //---------
+
+    buildCurClient();
+    toggleButtonControl(false);
+
+    function buildCurClient() {
+        curClient = new ArpcClient("ws://localhost:8885/ws", null)
+        curClient.handle(API_BroadcastPublicPinInfo, function(ctx) {
+            console.log("[Public] ", ctx)
+            updateCardsWithDataArr(ctx.data)
+        });
+        curClient.handle(API_BroadcastPinInfo, function(ctx) {
+            console.log("[Main] ", ctx)
+                // updateCardsWithDataArr(ctx.data)
+        });
+        curClient.onOpen = function(event) {
+            console.log("open success");
+            readyForPublicPinData();
+        }
+    }
+
+    function readyForDirectlyClients() {
+        obtainServerList();
+    }
+
+    function readyForPublicPinData() {
+        curClient.call(API_BroadcastPublicAuth, "", 5000, function(ctx) {
+            if (ctx.data.code === RSP_SUC) {
+                console.log("Success , Ready For Public Data. ")
+            } else {
+                if (ctx.data.code === RSP_FAIL_NOT_CONFIG) {
+                    configServerTutorials();
+                    showFailed("Failed, Sever not config ready yet.")
+                } else {
+                    console.log("Failed with other reasons ", ctx.data)
+                    showFailed("Failed with other reasons.")
+                }
+            }
+        })
+    }
+
+    function configServerTutorials() {
+
+        let configServerElement = document.createElement("div")
+        configServerElement.innerHTML = `
+        <div class="form-back">
+                <div class="form-item"></div>
+                <div class="form-item form-item-content">
+                    <form novalidate class="form-form">
+                        <div class="form-header">
+                            <h3>Config Server</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="config-server-name">Server Name</label>
+                            <input type="text" id="config-server-name" class="form-control" placeholder="Name">
+                        
+                            <label for="config-server-address">Address</label>
+                            <input type="text" id="config-server-address" class="form-control" placeholder="Address">
+                        
+                            <label for="config-server-port">Port</label>
+                            <input type="number" min="0" max="65534" step="1" id="config-server-port" class="form-control" placeholder="Port">
+                        
+                            <label for="add-server-webport">WebPort</label>
+                            <input type="number" min="0" max="65534" step="1" id="add-server-webport" class="form-control" placeholder="WebPort">
+                        
+                            <label for="config-server-pwd">Password</label>
+                            <input type="text" id="config-server-pwd" class="form-control" placeholder="Password">
+                        
+                            <label for="config-server-region">Region</label>
+                            <input type="text" id="config-server-region" class="form-control" placeholder="Region">
+
+                            <label for="config-server-transfer">Transfer(Option)
+                                <input type="text" id="config-server-transfer-limit" class="form-control" placeholder="Limited BandWidth, 0 for unlimited.">
+                                <span>By </span>
+                                <select id="config-server-transfer-cycle" name="TransferCycle">
+                                    <option value="0">Day</option>
+                                    <option value="1" selected>Month</option>
+                                    <option value="2">Season</option>
+                                    <option value="3">Year</option>
+                                </select>
+                            </label>    
+
+                            <label for="config-server-billing">Billing(Option)
+                                <input type="text" id="config-server-billing-limit" class="form-control" placeholder="Billing Price, 0 for free.">
+                                <span>By </span>
+                                <select id="config-server-billing-cycle" name="TransferCycle">
+                                    <option value="0">Day</option>
+                                    <option value="1" selected>Month</option>
+                                    <option value="2">Season</option>
+                                    <option value="3">Year</option>
+                                </select>
+                                <span>Start On : </span>
+                                <input type="date" id="config-server-billing-start">
+                            </label>    
+
+                        </div>
+                        <div class="form-footer">
+                            <button type="button" onclick="configServerSubmit()">Submit</button>
+                            <button type="button" onclick="closePanel()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="form-item"></div>
+            </div>
+        `
+
+        showPanelWithElement(configServerElement)
+    }
+
+    function closePanel() {
+        document.getElementById("shadow").classList.remove("show");
+        setTimeout(clearPanel, 1000);
+    }
+
+    function showPanelWithElement(ele) {
+        clearPanel();
+        document.getElementById("shadow").style.display = "block";
+        document.getElementById("shadow-content").append(ele);
+        document.getElementById("shadow").classList.add("show");
+    }
+
+    function clearPanel() {
+        document.getElementById("shadow-content").innerText = "";
+        document.getElementById("shadow").style.display = "none";
+    }
+
+    //config server
+    function configServerSubmit() {
+        let serverName = document.getElementById("config-server-name").value;
+        let serverPwd = document.getElementById("config-server-pwd").value;
+        let serverAddress = document.getElementById("config-server-address").value;
+        let serverPort = document.getElementById("config-server-port").value;
+        let webPort = document.getElementById("add-server-webport").value;
+
+        let data = JSON.stringify({
+            "Name": serverName,
+            "Address": serverAddress,
+            "Password": serverPwd,
+            "Port": parseInt(serverPort),
+            "WebPort": parseInt(webPort),
+        })
+
+        console.log("submit config self server : ", data)
+
+        curClient.call(API_ConfigServer, data, 5000, function(ctx) {
+            if (ctx.data.code === RSP_SUC) {
+                console.log("Success.")
+                closePanel();
+                readyForPublicPinData();
+            } else {
+                if (ctx.data.code === RSP_FAIL_NOT_CONFIG) {
+                    showFailed("Failed, Sever not config ready yet.")
+                } else {
+                    console.log("Failed with other reasons ", ctx.data)
+                    showFailed("Failed with other reasons.")
+                }
+            }
+        })
+    }
+
+
+    //add remote server
+    function addServerTutorials() {
+        let addServerElement = document.createElement("div")
+        addServerElement.innerHTML = `
+        <div class="form-back">
+                <div class="form-item"></div>
+                <div class="form-item form-item-content">
+                    <form novalidate class="form-form">
+                        <div class="form-header">
+                            <h3>Add Server</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-server-address">Address</label>
+                            <input type="text" id="add-server-address" class="form-control" placeholder="Address">
+                    
+                            <label for="add-server-port">Port</label>
+                            <input type="number" min="0" max="65534" step="1" id="add-server-port" class="form-control" placeholder="0~65535,0 means disable.">
+                        
+                            <label for="add-server-access-key">AccessKey</label>
+                            <input type="text" id="add-server-access-key" class="form-control" placeholder="AccessKey">
+                        
+                            <label for="add-server-pwd">Password(Optional)</label>
+                            <input type="text" id="add-server-pwd" class="form-control" placeholder="password">
+                        </div>
+                        <div class="form-footer">
+                            <button type="button" onclick="addServerSubmit()">Submit</button>
+                            <button type="button" onclick="closePanel()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="form-item"></div>
+            </div>
+        `
+        showPanelWithElement(addServerElement)
+    }
+
+    function addServerSubmit() {
+        let serverPwd = document.getElementById("add-server-pwd").value;
+        let serverAddress = document.getElementById("add-server-address").value;
+        let serverPort = document.getElementById("add-server-port").value;
+        let serverAccessKey = document.getElementById("add-server-access-key").value;
+
+        let data = JSON.stringify({
+            "AccessKey": curClientAccessKey.AccessKey,
+            "Server": {
+                "Address": serverAddress,
+                "Password": serverPwd,
+                "AccessKey": serverAccessKey,
+                "Port": parseInt(serverPort)
+            }
+        })
+
+        console.log("add remote server : ", data)
+
+        curClient.call(API_AddNewServer, data, 5000, function(ctx) {
+            if (ctx.data.code === RSP_SUC) {
+                console.log("Success.")
+                closePanel();
+                //directly mode should add server manually
+                if (mode) {
+                    updateServerListsWithNewServer(ctx.data.data)
+                }
+            } else if (ctx.data.code === RSP_FAIL_NOT_CONFIG) {
+                // remote server not config yet.
+                configRemoteServerTutorials()
+            } else {
+                console.log("Failed with other reasons : ", ctx.data)
+                showFailed("Failed with other reasons.")
+            }
+        })
+    }
+
+
+    //config rmeote server
+    function configRemoteServerTutorials() {
+        let configRemoteServerElement = document.createElement("div")
+        configRemoteServerElement.innerHTML = `
+        <div class="form-back">
+                <div class="form-item"></div>
+                <div class="form-item form-item-content">
+                    <form novalidate class="form-form">
+                        <div class="form-header">
+                            <h3>Config Remote Server</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="config-remote-server-name">Server Name</label>
+                            <input type="text" id="config-remote-server-name" class="form-control" placeholder="Name">
+                        
+                            <label for="config-remote-server-address">Address</label>
+                            <input type="text" id="config-remote-server-address" class="form-control" placeholder="Address">
+                        
+                            <label for="config-remote-server-port">Port</label>
+                            <input type="number" min="0" max="65534" step="1" id="config-remote-server-port" class="form-control" placeholder="Port">
+                        
+                            <label for="config-remote-server-webport">WebPort</label>
+                            <input type="number" min="0" max="65534" step="1" id="config-remote-server-webport" class="form-control" placeholder="WebPort">
+                        
+                            <label for="config-remote-server-pwd">Password</label>
+                            <input type="text" id="config-remote-server-pwd" class="form-control" placeholder="password">
+                        
+                            <label for="config-remote-server-region">Region</label>
+                            <input type="text" id="config-remote-server-region" class="form-control" placeholder="Region">
+                        </div>
+                        <div class="form-footer">
+                            <button type="button" onclick="configRemoteServerSubmit()">Submit</button>
+                            <button type="button" onclick="closePanel()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="form-item"></div>
+            </div>
+        `
+        showPanelWithElement(configRemoteServerElement)
+    }
+
+    function configRemoteServerSubmit() {
+        let serverName = document.getElementById("config-remote-server-name").value;
+        let serverPwd = document.getElementById("config-remote-server-pwd").value;
+        let serverAddress = document.getElementById("config-remote-server-address").value;
+        let serverPort = document.getElementById("config-remote-server-port").value;
+        let webPort = document.getElementById("config-remote-server-webport").value;
+
+        let data = JSON.stringify({
+            "AccessKey": curClientAccessKey.AccessKey,
+            "Server": {
+                "Name": serverName,
+                "Address": serverAddress,
+                "Password": serverPwd,
+                "AccessKey": serverPwd,
+                "Port": parseInt(serverPort),
+                "WebPort": parseInt(webPort)
+            }
+        })
+
+        console.log("submit config remote self server : ", data)
+
+        curClient.call(API_ConfigRemoteServer, data, 5000, function(ctx) {
+            if (ctx.data.code === RSP_SUC) {
+                console.log("Success.")
+                closePanel();
+                //directly mode should add server manually
+                if (mode) {
+                    updateServerListsWithNewServer(ctx.data.data)
+                }
+            } else {
+                console.log("Failed with other reasons : ", ctx.data)
+                showFailed("Failed with other reasons.")
+            }
+        })
+    }
+
+
+
+
+
+    function disConnected() {
+        console.log("end")
+        if (!mode) {
+            //close public broadcasting
+            curClient.call(API_BroadcastPublicAuthRemove, "", 5000, function(ctx) {
+                if (ctx.data.code === RSP_SUC) {
+                    console.log("Success , Remove For Public Data. ")
+                } else {
+                    if (ctx.data.code === RSP_FAIL_NOT_CONFIG) {
+                        console.log("Failed, Sever not config ready yet.")
+                        showFailed("Failed, Sever not config ready yet.")
+                        configServerTutorials();
+                    } else {
+                        console.log("Failed with other reasons ", ctx.data)
+                        showFailed("Failed with other reasons.")
+                    }
+                }
+            })
+        } else {
+            //close directly
+            if (serverListsAddressClients != null) {
+                serverListsAddressClients.forEach(function(value, key) {
+                    if (value != null) {
+                        value.shutdown();
+                    }
+                });
+            }
+        }
+    }
+
+    function changeMode() {
+
+        disConnected()
+
+        mode = !mode
+        console.log("[Mode]Change To ", mode == true ? "Main" : "Public")
+
+        if (mode) {
+            readyForDirectlyClients()
+        } else {
+            readyForPublicPinData()
+        }
+    }
+
+
+    function updateCardsWithDataArr(dataArr) {
+        if (Array.isArray(dataArr) && dataArr.length != cardTotal) {
+            updateDomWithCardsNumber(dataArr.length);
+        }
+
+        if (sortValue === "none") {} else {
+            dataArr.sort(function compare(data1, data2) {
+
+                switch (sortValue) {
+                    case "name":
+                        let name1 = data1["NickName"].length > 0 ? data1["NickName"] : data1["Name"]
+                        let name2 = data2["NickName"].length > 0 ? data2["NickName"] : data2["Name"]
+                        return sortString(name1, name2)
+                        break;
+                    case "system":
+                        return sortString(data2["SystemOS"], data1["SystemOS"])
+                        break;
+                    case "virtual":
+                        return sortString(["Virtualization"], data1["Virtualization"])
+                        break;
+                    case "uptime":
+                        if (data1["StartupTime"] <= 0) {
+                            return 1;
+                        }
+                        if (data2["StartupTime"] <= 0) {
+                            return -1;
+                        }
+                        return data1["StartupTime"] - data2["StartupTime"]
+                        break;
+                    case "memory":
+                        return data2["MemTotal"] - data1["MemTotal"]
+                        break;
+                    case "sawp":
+                        return data2["SwapTotal"] - data1["SwapTotal"]
+                        break;
+                    case "disk":
+                        return data2["DiskTotal"] - data1["DiskTotal"]
+                        break;
+                    case "traffice":
+                        return data2["TrafficRecvTotalPerMonth"] - data1["TrafficRecvTotalPerMonth"] + data2["TrafficSentTotalPerMonth"] - data1["TrafficSentTotalPerMonth"]
+                        break;
+                    default:
+                        return 0;
+                        break;
+                }
+            })
+        }
+
+        sortedServerListsInfos = dataArr
+
+        for (let index = 0; index < dataArr.length; index++) {
+            const data = dataArr[index];
+            updateCardWithData(index, data);
+        }
+
+    }
+
+    function sortString(str1, str2) {
+        return str1 !== str2 ? str1 < str2 ? -1 : 1 : 0
+    }
+
+    function updateCardWithData(index, data) {
+        if (data["Online"]) {
+            document.getElementById("card-" + index).style.opacity = "1";
+            document.getElementById("card-status-" + index).classList.add("online")
+        } else {
+            document.getElementById("card-" + index).style.opacity = "0.3";
+            document.getElementById("card-status-" + index).classList.remove("online")
+            if (document.getElementById("card-name-" + index).innerText === (data["NickName"].length > 0 ? data["NickName"] : data["Name"])) {
+                return
+            }
+        }
+
+        document.getElementById("card-name-" + index).innerText = data["NickName"].length > 0 ? data["NickName"] : data["Name"]
+        document.getElementById("card-info-system-" + index).innerText = data["SystemFamily"] + " " + data["SystemOS"] + " " + data["SystemVersion"]
+        document.getElementById("card-info-kernel-" + index).innerText = data["KernelArch"] + " " + data["KernelVersion"]
+        document.getElementById("card-info-virtual-" + index).innerText = data["Virtualization"] + " " + data["VirtualizetionRole"]
+        document.getElementById("card-info-uptime-" + index).innerText = startupFormat(data["StartupTime"])
+
+        document.getElementById("card-info-cpu-" + index).innerText = parseFloat(data["CPUUsage"]).toFixed(2) + "%"
+        document.getElementById("card-info-mem-" + index).innerText = formatBytes(data["MemUsed"]) + " / " + formatBytes(data["MemTotal"])
+        document.getElementById("card-info-mem-swap-" + index).innerText = formatBytes(data["SwapUsed"]) + " / " + formatBytes(data["SwapTotal"])
+
+        document.getElementById("card-info-disk-" + index).innerText = formatBytes(data["DiskUsed"]) + " / " + formatBytes(data["DiskTotal"])
+
+        var arr = [
+            parseFloat(data["CPUUsage"]).toFixed(2),
+            parseFloat(data["MemUsage"]).toFixed(2),
+            parseFloat(data["SwapUsage"]).toFixed(2),
+            (data["DiskTotal"] > 0 ? (data["DiskUsed"] / data["DiskTotal"] * 100) : 0).toFixed(2)
+        ]
+
+        strokeChartWithPercentage(arr, index)
+        tmpMapForPercentage.set(index, arr)
+
+
+        document.getElementById("card-info-traffic-send-" + index).innerText = formatBytes(data["TrafficSent"]) + " /s "
+        document.getElementById("card-info-traffic-recv-" + index).innerText = formatBytes(data["TrafficRecv"]) + " /s "
+        document.getElementById("card-info-traffic-month-send-" + index).innerText = formatBytes(data["TrafficSentTotalPerMonth"])
+        document.getElementById("card-info-traffic-month-recv-" + index).innerText = formatBytes(data["TrafficRecvTotalPerMonth"])
+        document.getElementById("card-info-traffic-total-send-" + index).innerText = formatBytes(data["TrafficSentTotal"])
+        document.getElementById("card-info-traffic-total-recv-" + index).innerText = formatBytes(data["TrafficRecvTotal"])
+
+    }
+
+
+    function updateDomWithCardsNumber(cardNum) {
+        let cardArea = document.getElementById("cardArea")
+        let originLength = cardArea.children.length
+        let offsetNum = cardNum - originLength
+        if (offsetNum > 0) {
+            //add card element
+            for (let index = 0; index < offsetNum; index++) {
+                cardArea.appendChild(cardElementWithID(index + originLength));
+                buildCanvasWithIndex(index + originLength);
+            }
+        } else {
+            //remove card element
+            for (let index = 0; index < Math.abs(offsetNum); index++) {
+                cardArea.removeChild(cardArea.children[cardArea.children.length - 1])
+            }
+
+        }
+    }
+
+    function cardElementWithID(numberID) {
+        let card = document.createElement("div")
+        card.innerHTML = `<div id="card-${numberID}" class="card">
+            <div class="card-content">
+                <div class="card-top">
+                    <div id="card-status-${numberID}" class="status"></div>
+                    <div id="card-name-${numberID}" class="card-title">{{ Name }}</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-body-item">
+                        <img id="card-icon-system-${numberID}" class="icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAMAAABHPGVmAAACr1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACia+DyAAAA5XRSTlMAAQMKHjM5NCsIKXGvzdXWSL7u+Pv9/v+9L8z3B2Do+gILBX/s8+Lc8PkbQmeCdJHFSmKitQQcY7jg7/TruTcOpPL1yQwSGa72nhW30CLL44ojINMl54mB25ch1HwYhOSPBi3Svx2AH5Tm3WgRMG6VEBQnp+oxyl666bbG8Tw/re38mCSDJqvZxIY9DzW04YjXTGabWUBboXnDWg2fpbPPnEdG0XpyTZLOc502WEF9Fm/CGlJQXarAi9jHS5CNk7u8OtrlLKlU37F7RU8u3kOoCWwXMnc+jm2shVawX8Fwo3bIa1d+1ZhnTgAAChBJREFUeAHskYMRA1EURbO2bdvov7XYGYSj7Pnmw139BwsLAAjBCIrhOIYiMAQCP7FBkBTNsBy7rQxNkcQvrBC8IEqyomqaqsiSqPPE922AhmntTOzYmbFMA/xKgq4TYjuu58nKwYgie57r2I93X8QH7QAKL+sgipM0y4tduoo8S5M4Ci6nIRTYoP+qCbus6qZFz+oCQZcn/TA20zxPzTj0Sd4F50MCbZu6KjfEV4V7o84W/ZjKVlaBZAW2pMKWZF0mLSEOodRbaOru7u7utvb/PiYbQmWFvJ/l05y5h3PPvaN0MjIYdBcV8x7B6/PnGVAgGAqLqVJEdrnkiJQqhkPBAGb48Pu8gocvLnJDzLpGWolit5Mk4S11xbsLysrDSkUl/PEPVlYo4fIyY8xV6iVI0m5XStIsq8C0KjSLyJAnVF1TC39gqkhRWp0hUqdRlKjGh2prqvVQEs26qjRosR/uEjsiROsbGnG+qRkgEGa0UFSFKVJBUS0ZsX+guYnHGxvqozFSidtaX+giBU1TvLWsrZ3nOjrbdBrW1d0jsL19RoH6elmhp7sL01Nq6+zg+Pa2slYcsZQi2pIRVzHKie1vc4CBwSFueGQUgMDY+H0uZ2LSEY+ZnMjh7o+PBQAYHRnmhgYHgKOtn0VWil1WrICXvP2xHe+f0rOG0zOzXM+IOtcw7w0LhQt0vK0YvVAohL3zDXPqSA83OzMNdd5UP64T+ZfASrVeeUgy2toWi+3yLy7hw8sruJNkVsW1BB+siasM6cRXlofxpUV/Vwxra42SpOeVhXphua8FMlRfFjedub7BbwoEs7VFRLfNpjrc21Fia4shhE1+Yz0zDpbVh0jhdS72Z5GUN17C09AGDGM72SJLEc5VbXcPmmFwb1dbdRIUK2bvGKmDtgYP4X2TYmGp5KX7vKHG9gFoUKX0/YPhw6Pjk2vFBifHR4fDB/vpkgHDgfbGkNeXnmfp4PCXVuP84HSX4S1P9h9Pn0Ds5r5wMn3sl/MMuGt6kMerS/3Wjhksz1XDc0MzZrgDAAf2k0CEm6nNDHF8jQuJWvqB2qYObnZxnba+p9Lri7NcR1MtsE6BzZ3D3NLGjmUK2NlY4oY7m2FSh23bSA/OZ0sWvWNSNo/3jLSBJE8tfbvYFK3NFDQjxU19+3EkfXFQlwV2X77Oc0ip3aen3anSDVjeZ4VlNfmLBZhbIagDP7jm7jj/TDs/187yj69lDfwHFLEyl7QIFmjAGWL4+AoRZl1cKrbYZUW5vMiCV0SOhwkGbwhgydyEAIRdY/POLefhtMP0kTHjiUnEZDwzGVeGpg/14PmxLggBZkEJ0Lm5gTI1o3vcS26tHp0kKFikZtPQQCqbNRFz7ORodYv0jndnqGWB3Fwa/OG++/R5/ttgudjScz/MENoxTCQb+awxj6/8GO1zJOEFHmsEE77f0yKWB9/mP3+aif1O4+GznAIuFKYogRNWo7sJIzCjRnPa0P2Ue/eOQ7dVm1OryYAJK7vRVZ1CUeEQV5Dz7OFvVEDWE4ph2bBCUWxOobi9BwwfWTObjM3uVJZ6v8jyl94lxWm3MZszWQ6DubctFuawFKWEWZahnmT9umIp2TjJvHgnVmgVvRMLa+5EsUYvUM+dX799V2kMo9Xv3746UfcvRhMFc68tTPTqRPHdC4bEs1N+KZJ6l7CRhe9TK+vq+iav3G0dx5eo58q3+NMHAynfFNT9y2MzBtCTfXV1lanvC0kbcTf1lyJp90i96B8kCOG1vV3KR5+0L303z/jvS3Ykmy9d2/l1ovRBbxl5L+2XIun3UVFeR245PENGbL2qOWnV3hh0divjyGtUyPvpvxS58wA9DD7KN/FuDU1a7gttQvQXDmFa981Y+SP6xoM7vxTJuI+In1w38dNzhL+TMRPC5HcIOz+9Gev6hPD7Gf+KyH9brv+1axbebZtRFJ9U5tZW9NbKtRTTsTKGoLy6YU7KHGZmcBdSKZyMy8zMzMzMMN4fsuiTaQyfdLA6JGbdd9/vSv0Hr8IrrP7HiC8r3yxl/0RWPnXKimhdFoEvkNUsDX8USFYrC6RIhy1fsZLAlXr4M6kPA1aS+oYGyoei2VVxhBpFi6dNI8PjV6/RtMxeSwO9rp8a5VfLdK9fmLJho22TvaQNQDOBUMFI9FjNozZvWe7YWv4GN3abyG4nsSwR/Kkl2jGLpcyOtLIK6bCLa9kdOgxzZ7HF/6m52zm6ymKq3VWOmpXd20L2ZODY1J1/YVP9hyweuBctMWyZpU+vUMlwE7K167ev1THPl1C1dSDXFxbOs6vcBAVkJ9cNUaed2+9q57hlYUkHVGpMD46YLjemZJm24StOpRb70P4e1GITgWFU9JSUlboMTgVYcPhIIYIF/ZMYU+uoo1XHDvkqgz2Ews1u7JFx/IRVwh7+J0+kmZkYs1kznlME4PC0EO0GOG0sgwCOYc4HuadOn9GLZ8uVQFHhIQDUOReK0gPtRFGcvyHjpEAnZyoB1Q7aAESbE6odA/CCauRmH3CUKIEHz5sBNC48yP8GD/r3HdOxWAnQWRMCcOGiDDpDpK0YN+gkcwEcl5RAtgeOA7Rc9iBb6A7gXJXvGx4KSrDg81wZPpM7aKD2nXbBZ7jYJbPifn4LpzRN95nqh4PRh7awMQij79xI+SQMP9HCo2hFc0XSBSIxd/iFgotXrfwxA0YgsHKpSPNVEoHgdl5jAERBBADxRBMSmZU7rA0hDbbk1vg5BEa0cf00A3QVqjaE3xhnPCTGB5Bo1Rsmqvarm423pnUSWCHNbQHo7pXy4e8kMdLMsDGDCHnLdp7JzSA5Ajtuomj67j3n6aTcHxN8O2h8hXN18j1m7kJFgjORZna59dK/M+WBnXSf252rcx9y/zcCfNMTAbKU9tTKv1oz45F+fqY/bpg56naocHnvX9/zA0tsazdweLHs4+2tBU/8CFR84rwtGGmPG4Jm95/taPsaK+z0f1qQth01OVzO0oRnG+65X8CD8WvT5UIU+Xz67Rc4Yee9l/ySSLTTV0cFLesok9stIm+iidVa4w9mSBNx2dovdRgHyVhKWSUKpBtvuTpxbRhv+ZpAl/WVgxdOLEmb9UHf11W+yMz2+mMchHtKQ8O7vuTBC2mvfCe/vdbUjk753mzNt4dzyr+bPuotzt6rhZhDHM5DWdwDELa5MSltT58bsa8Ja+uU5laMCMvvO5o9vXrMwFQGYFwUXqB9QwMQelF/faVkro8wU9FDedDKINGNO20rCAO4OIHDi7f9P4i3xVjlr9FwShgX2c++8t7eucJ2DvV234fG6KM7MI8hafLOordTCHRZPzT8+Hb+J/PTAxOsdYSMRH4KHKsjFPlhwmlbuZ9DzDESXQ0TTDdc5UjxHyhyshlJm2lRWPNAvZ9ApvxyovXChdb9m9H9U+sohr0BD1JyKv6Ykr8eXg+/Au6+SUIUB3T+AAAAAElFTkSuQmCC
+"></img><span id="card-info-system-${numberID}"> {{ SystemOS }} {{ SystemFamily }} {{ SystemVersion }}</span>
+                    </div>
+                    <div class="card-body-item">
+                        <img id="card-icon-kernel-${numberID}" class="icon" src="icon/cpu.png"></img><span id="card-info-kernel-${numberID}"> {{ KernelArch }} {{ KernelVersion }}</span>
+                    </div>
+                    <div class="card-body-item">
+                        <img id="card-icon-virtual-${numberID}" class="icon" src="icon/cpu.png"></img><span id="card-info-virtual-${numberID}"> {{ Virtualization }} {{ VirtualizationRole }}</span>
+                    </div>
+                    <div class="card-body-item">
+                        <img id="card-icon-uptime-${numberID}" class="icon" src="data:image/png;base64,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
+"></img><span id="card-info-uptime-${numberID}"> {{ StartupTime }}</span>
+                    </div>
+                </div>
+                <div class="card-bottom">
+                    <div class="card-bottom-item">
+                        <div class="card-bottom-item-container">
+                            <div id="card-bottom-item-cpu-${numberID}" class="card-cpu card-bottom-item-container-list" onclick="chartOfType(${numberID},'cpu')">
+                                <img id="card-icon-virtual-${numberID}" class="card-bottom-item-container-list-icon" src="data:image/png;base64,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
+"></img>
+                                <div id="card-info-cpu-${numberID}">{{ CPUUsage }} %</div>
+                            </div>
+                            <div id="card-bottom-item-mem-${numberID}" class="card-mem card-bottom-item-container-list">
+                                <img class="card-bottom-item-container-list-icon" id="card-img-mem-${numberID}" src="icon/cpu_cover.png" />
+                                <div id="card-info-mem-${numberID}">{{ MemTotal }} {{ MemUsage }}%</div>
+                            </div>
+                            <div id="card-bottom-item-swap-${numberID}" class="card-mem card-bottom-item-container-list">
+                                <img class="card-bottom-item-container-list-icon" id="card-img-mem-swap-${numberID}" src="icon/cpu.png" />
+                                <div id="card-info-mem-swap-${numberID}">{{ SwapTotal }} {{ SwapUsage }}%</div>
+                            </div>
+                            <div id="card-bottom-item-disk-${numberID}" class="card-disk card-bottom-item-container-list">
+                                <img class="card-bottom-item-container-list-icon" id="card-img-disk-${numberID}" src="icon/cpu.png" />
+                                <div id="card-info-disk-${numberID}">{{ DiskUsed }} / {{ DiskTotal }}</div>
+                            </div>
+                        </div>
+                        <div class="card-bottom-item-container-canvas">
+                            <canvas id="card-info-chart-${numberID}" width="160px" height="160px">
+                        </div>
+                    </div>
+                    <div class="card-bottom-item">
+                        <div class="card-bottom-item-container">
+                            <div class="cart-network">
+                                <div>
+                                    <img class="traffice-icon" src="data:image/png;base64,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
+" />
+                                    <span id="card-info-traffic-month-send-${numberID}">{{ TrafficSentMonth }}</span>
+                                    <div></div>
+                                    <img class="traffice-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAQAAADa613fAAAISUlEQVR4Ae3ZBXAc15aH8d+9PTMCyxCZFIPCzMzMtpeZmZl5i5e3aJmZHvML52GYmTkmOYkg1mio71Y96KqobYXbU/X0iXXOwFf/Cw0WWWSRRRZZZJFFvjYIwpup9z9n+x6ZvZH5Hmfrf9T8quscJipDdJjr/KqaPic6yGdt9c/WiuWqtf7ZVp91kKivGfLTdmna6ocNlat+2FZNu/y0IX3NRh/R1NH0EePmM66o2qivOc3DOno6nnCO+ZzjCV+qethp3lWid5fllguCaIVR8xm1QhSEL/X1tciAhgAahgUoCIY1QNAw4F2l5t2lJhMQRDXlahQQZGp9nEiJsMBf+lskQJHJPIo8IPS3SHrTiaR+TyQAgkyEgihTVPs4kRKhJBKU6VOR7E0nkvWzSJj3VrN5kq+vhn4WiQKAWimRWrmzD0VKg6deEqmXB17/i9ijiP4XKc+CRkmkUZpBfXqsFQQKaqUNsYZyb/+vWiWRvly1sjdMJJTrb5hIVrXIsD8zLCqLhAWOphLlzoLoS89arcigU/2cFeI8EQVpjyJpr4lFK/ycUw1WKZJZZcxP+TVjor2RSwpSkOT2RjTm1/yUMatk1YlEY0as9oN+xFLlwaT8V0gL1IOlfsQPWm3EmFidCMvV1Y36ARerl99cWWTBat3FfsCourrlVCeS6+kJajb4AesFgLe0akkhSQTr/YANaoKenrxKkUmTCGrOcJ66t0VIgqDuPGeoCZg0WaVIstVTEqJRm62mfCq1xw1RQRQICWtsNioiecpWqToRJtyuDV/K5CQZCFCWKojloReik76UB7TdboIqRZputUtCsNYmK+adZYS9JhLmda5wlbUCkl1u1axWJPeQe/VAw4WOEUuHHbEkEkuHKNExLtQAPfd6SF6tCBNuMguCcVdZCuW3uvCRmKWuNC6AWTeZoGqRlps9KweDLneYiOStEB3mCoMg92z9Vq3qRZKnfF6neEObjEiSBBK6pZ28S1FPkhGbHCaCji8sf15drFqEadeZkMCwLY5EF0DS1lOAnnahRhdH2mIYJBOuy7OBcUvUhGpFuu51px6C6EibDOpIhchcSWROUdUxaJMjRQE9d7qnvqF+pdONGRSqFGGHq00Dhn2dQ3TlgKSpowAdzUIk13WIrzNcpHu1HYOt/DQ/7BIbCpWKRNo+7wE9SRAdbpOgV4jMlkRmC5GeYJPDRUHS84DPaz93bxiKF/pm5xjTEKoTSV5wdbEID9li/2JC59olkbYcCV3722KoWHiv9oIkLbte5lSbnG5NoVKBCLNu8IQcRIc6RVsqZkGuALlOUWs7xaEiyD3hBrPQ+t+4yqjTvqSyWr06kdyTrjEnIRh0qsSbONFKTjUoIJlzjSfl8Nq6RpBZ6XRbnGKFTKhGhBnXeFYCwZi6BJK8rF3U6sYEkDzrGjPAfusb04K6Nc6w2YmWVCfS87AbtSQE9WJfsEcRxb5TF5C03OhhPWBkR7oRDFrjdFc62hKhEpEUjpn2KS8VmQwIC1xFKXe95JMmAZbt6MyEJMgMWe90Z1qrVomI+GA89iGf1ZFed3ie65pPV07RRdLxWfcVnRota2Vqosywg5zucCNiFSKEK1/xCdslEN6MSJHHdp/wsoKhRjooRVGUyYw4yrFWqwnvvUjS+rOmO31BVwKQdHVKh/GdUs8X3KmrYHCdAxFANGB/x1lngCpE8pSb8JEiE4KgrVkSaWoLAkUeHzGhUDtm5KWzegMAomiJI4xrVJBISEGg7RY3ar/ukHG3+ex+3WFj241u0VYQ17xyQk+hTZAZdbDhCkQAyU7v87xcAsyYLiUybUaRo+e9z05JwdTJcxfnhUYxvMasEKsSoeM2H7ZbAsk2k6WdfdK2or7bh92mo0CYPad5aFJAENSNWCarToRJ/+5mTbncnHsLKRRv/l5zcrmmm/27SQWctKp5RCsDSZKKwRXVRaE6kdyT/tgNdphxv2t1SiId17rfjB1u8MeelCsQOj/QO6WnECGBIJcEqhOh7Wa/6If9uF911x73kbv8qh/3w37RzdoKhLPW7fzN1urS3eEk6WpJFkbwbhNFUdKVlAlqglwuV8C6VcM/9/zvt+cfYCY9Uz7kLz2pZUGCPmDdcPuSuT987Zj5+5OkY8J/+Vsv6VmQaN8TWmfP/tjs4eUDTLmul+3QliyMmn3O6BmzP9u+Kq/N0yDJzdnmRXP9L2J04+zPtC+YpwG5pGfa017q/0SsWDH1h/nXp6XmkyRJx3aP2K7DPhNJQQjkyhBGlzY2bp8a2jj5uy7RUNbI5bqmPeJhr+rBvprs4dnG+4bf10ghBVHt0IEDB2XINqxftdkvtv+1dm/zepcYUKanJzfnBbd7yqx8HyYi3ZF/YuDR4359fO6ANUvyyd07l7x2+LLJk14bn6g7sHdUt77grdaulm2+6E4TusC+20eCaL+Bk3x9uDBuyAfz2AupaSANJAuQ62pr2+EW73eHV+X7WgTqVjvPFqdZY1AmiDJ7J+maM2vCnT7pFhPa3hSZ95akbUrLiOUaoiSCUNQpfpdra5my1R2udqedOvSHCLmWSTOiJQZEJIRiNgQJSVfLnN1e9YSbfcpdJrSl/hEh1/SyXeZkolAsrz1d3eJnU9MrnvOgm9zkAa/qSPqMoG7Ucb7Ln/iYuzxlm11e/pLeTttt85yHfd6/+nVbHGRY0LdEg8ac5jv8rn/wCTe70x1u90Wfdb0P+XM/4XJHW2VA1NcENUuMOdI5NvtuP+pn/IJf9DO+z2WOM26/ty8RKpeJajI10aCGDB1z5nT19CSp/0UKBBAFQZIkuUUWWWSRRRZZZJFF+pb/B8eDDsM7P4u2AAAAAElFTkSuQmCC
+" />
+                                    <span id="card-info-traffic-month-recv-${numberID}">{{ TrafficRecvMonth }}</span>
+
+                                </div>
+                                <br>
+                                <div>
+                                    <img class="traffice-icon" src="data:image/png;base64,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
+" />
+                                    <span id="card-info-traffic-total-send-${numberID}">{{ TrafficSentTotal }}</span>
+                                    <div></div>
+                                    <img class="traffice-icon" src="data:image/png;base64,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
+" />
+                                    <span id="card-info-traffic-total-recv-${numberID}">{{ TrafficRecvTotal }}</span>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="card-bottom-item-container">
+                            <div>
+                                <img class="traffice-icon" src="data:image/png;base64,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
+    " />
+                                <span id="card-info-traffic-send-${numberID}">{{ TrafficSent }}</span>
+                                <div></div>
+                                <img class="traffice-icon" src="data:image/png;base64,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
+    " />
+                                <span id="card-info-traffic-recv-${numberID}">{{ TrafficRecv }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`
+        card.classList.add("card-wrap");
+        return card
+    }
+
+    function toggleButtonControl(admin) {
+        let div = document.getElementById("control-bar")
+        if (admin) {
+            div.innerHTML = `
+            <button class="pin-icon-logo" onclick="changeToAdmin()">P</button>
+            <span style="color: white;align-self: flex-end;">inServer</span>
+            <button class="pin-icon-button" onclick="changeMode()">更换模式</button>
+            <button class="pin-icon-button" onclick="disConnected()">结束连接</button>
+            <button class="pin-icon-button" onclick="addServerTutorials()">添加服务</button>
+            <select id="card-sort" class="pin-icon-button card-sort" onchange="cardSortChange(this)">
+                <option value="none" selected>Default</option>
+                <option value="name">Name</option>
+                <option value="system">SystemOS</option>
+                <option value="virtual">Virtual</option>
+                <option value="uptime">Uptime</option>
+                <option value="memory">Mem</option>
+                <option value="sawp">Swap</option>
+                <option value="disk">Disk</option>
+                <option value="traffice">Traffic</option>
+            </select>
+            `
+        } else {
+            div.innerHTML = `
+            <button class="pin-icon-logo" onclick="changeToAdmin()">P</button>
+            <span style="color: white;align-self: flex-end;">inServer</span>
+            `
+        }
+    }
+
+    function changeToAdmin() {
+
+        // configServerTutorials()
+        // return;
+
+        let pwdInput = document.getElementById("pwd-input");
+        if (pwdInput != null) {
+
+            let data = JSON.stringify({
+                "SessionID": "Password": pwdInput.value
+            })
+
+            curClient.call(API_AuthToken, data, 5000, function(ctx) {
+                console.log("obtain token: ", ctx)
+                if (ctx.data.code === RSP_SUC) {
+                    curClientAccessKey = ctx.data.data
+                    closePanel()
+                    toggleButtonControl(true)
+                }
+            })
+        } else {
+            //show pwd input panel
+            let pwdInputElement = document.createElement("div")
+            pwdInputElement.innerHTML = `
+            <div class="form-back">
+                <div class="form-item"></div>
+                <div class="form-item form-item-content">
+                    <form novalidate class="form-form">
+                        <div class="form-header">
+                            <h3>Admin Mode</h3>
+                        </div>
+                        <div class="form-group">
+                            <div>
+                                <label for="pwd-input">Password</label>
+                                <input type="text" id="pwd-input" class="form-control" placeholder="Password">
+                            </div>
+                        </div>
+                        <div class="form-footer">
+                            <button type="button" onclick="changeToAdmin()">Submit</button>
+                            <button type="button" onclick="closePanel()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="form-item"></div>
+            </div>
+            `
+            showPanelWithElement(pwdInputElement)
+        }
+    }
+
+    function obtainServerList() {
+
+        let data = JSON.stringify({
+            "AccessKey": curClientAccessKey.AccessKey
+        })
+
+        curClient.call(API_AddressIdentifyServer, data, 5000, function(ctx) {
+            console.log("server list: ", ctx.data)
+            if (ctx.data.code === RSP_SUC) {
+                console.log("Success Obtain Identify Server List ", ctx.data.data)
+                serverAddressIdentifyLists = ctx.data.data;
+                serverLists = Object.values(ctx.data.data);
+                updateServerLists()
+            } else {
+                console.log("Failed Obtain Server List ")
+                showFailed("Failed Obtain Server List ")
+            }
+        })
+    }
+
+    function updateServerLists() {
+
+        serverListsInfos = new Array()
+        serverListsAddressIndexMap = new Map()
+        serverListsAddressClients = new Map()
+        for (let index = 0; index < serverLists.length; index++) {
+            const element = serverLists[index];
+            serverListsInfos.push(defaultCardInfo(element.Name))
+            let address = getAddressFromElement(element)
+            serverListsAddressIndexMap.set(address, index)
+            serverListsAddressClients.set(address, buildClientWithServer(element))
+        }
+
+        updateDomWithCardsNumber(serverListsInfos.length)
+        updateServerInfoTimer()
+    }
+
+    function updateServerListsWithNewServer(svr) {
+        serverListsInfos.push(defaultCardInfo(svr.Name))
+        let address = getAddressFromElement(svr)
+        serverListsAddressIndexMap.set(address, serverListsInfos.length - 1)
+        serverListsAddressClients.set(address, buildClientWithServer(svr))
+
+        updateDomWithCardsNumber(serverListsInfos.length)
+    }
+
+    function updateServerInfoTimer() {
+        updateCardsWithDataArr(serverListsInfos.slice())
+        if (mode) {
+            setTimeout(updateServerInfoTimer, 1000)
+        }
+    }
+
+    function getAddressFromElement(element) {
+        let url = ""
+        if (element.WebPort != null && element.WebPort > 0) {
+            url = element.Address + ":" + element.WebPort
+        } else {
+            url = element.Address
+        }
+        return url
+    }
+
+    function buildClientWithServer(element) {
+        if (element.WebPort == null || element.WebPort <= 0) {
+            //not surpport web server
+            return null
+        }
+
+        let client = new ArpcClient("ws://" + getAddressFromElement(element) + "/ws", null)
+
+        client.handle(API_BroadcastPinInfo, function(ctx) {
+            console.log("[Main] ", ctx)
+            let matches = ctx.cli.url.match(/^ws?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+            let host = matches && matches[1];
+            updateInfoWithAddress(host, ctx.data)
+        });
+
+        client.onOpen = function(event) {
+            console.log("open success");
+
+            let data = JSON.stringify({
+                "AccessKey": element.AccessKey
+            })
+
+            client.call(API_BroadcastAuth, data, 5000, function(ctx) {
+                if (ctx.data.code === RSP_SUC) {
+                    console.log("Success , Ready For Data. ")
+                } else {
+                    if (ctx.data.code === RSP_FAIL_NOT_CONFIG) {
+                        console.log("Failed, Sever not config ready yet.")
+                        showFailed("Failed, Sever not config ready yet.")
+                        configServerTutorials();
+                    } else {
+                        console.log("Failed with other reasons ", ctx.data)
+                        showFailed("Failed with other reasons.")
+                    }
+                }
+            });
+        }
+        return client
+    }
+
+    function updateInfoWithAddress(address, info) {
+        serverListsInfos[serverListsAddressIndexMap.get(address)] = info
+    }
+
+    function cardSortChange(element) {
+        console.log("card sort change :", element)
+        sortValue = element.value
+    }
+
+    /*
+    Requests
+    */
+
+    function bridgeRequst(serverId, requestUrl, dataObject, responseFunc) {
+        var client = getRequestClientWithServerId(serverId);
+
+        client.call(API_BroadcastAuth, data, 5000, function(ctx) {
+            if (ctx.data.code === RSP_SUC) {
+                console.log("Success , Ready For Data. ")
+            } else {
+                if (ctx.data.code === RSP_FAIL_NOT_CONFIG) {
+                    console.log("Failed, Sever not config ready yet.")
+                    showFailed("Failed, Sever not config ready yet.")
+                    configServerTutorials();
+                } else {
+                    console.log("Failed with other reasons ", ctx.data)
+                    showFailed("Failed with other reasons.")
+                }
+            }
+        });
+    }
+
+    function getRequestClientWithServerId(serverId) {
+
+    }
+
+    /*
+    for canvas
+    */
+    function strokeChartWithPercentage(percentage, index) {
+        var canvas = document.getElementById("card-info-chart-" + index);
+        var context = canvas.getContext('2d');
+
+        var centerX = canvas.width * 0.5;
+        var centerY = canvas.height * 0.5;
+
+        var centerXOffset = 15;
+
+        context.lineCap = "round";
+
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        statusRadiusArr.forEach((radius, idx) => {
+            if (curSelectedChartIndex === index && curSelectedRadiusIndex === idx) {
+                context.lineWidth = selectedLineWidth;
+                context.font = "12px Arial";
+                centerXOffset = 16;
+            } else {
+                context.lineWidth = normalLineWidth;
+                context.font = "10px Arial";
+                centerXOffset = 15;
+            }
+
+            var offset = 0.1 * (idx + idx) * Math.PI * 0.5 + 0.1;
+            var rangeAngel = (2 * Math.PI - 0.2 * Math.PI - 2 * offset);
+
+            //stroke all
+            context.strokeStyle = '#eee';
+            context.beginPath();
+            context.arc(centerX, centerY, radius, startAngle + offset, startAngle + offset + rangeAngel, false);
+            context.stroke();
+
+
+            context.strokeStyle = '#000';
+            var endAngle = rangeAngel * percentage[idx] * 0.01; //"2 * PI" = 360° 
+            //and "/ 100 * e.percent" = e.percent%
+            context.beginPath();
+            context.arc(centerX, centerY, radius, startAngle + offset, startAngle + offset + endAngle, false);
+            context.stroke();
+
+            context.fillText(percentage[idx] + "%", centerX - centerXOffset, centerY - radius + 5);
+        })
+    }
+
+    function buildCanvasWithIndex(idx) {
+        var canvas = document.getElementById("card-info-chart-" + idx);
+        var context = canvas.getContext('2d');
+
+        canvas.onmousemove = function(e) {
+
+            // important: correct mouse position:
+            var rect = this.getBoundingClientRect(),
+                x = e.clientX - rect.left,
+                y = e.clientY - rect.top,
+                i = 0,
+                r;
+
+            var distanceX = Math.abs(x - 75);
+            var distanceY = Math.abs(y - 75);
+
+            var tmpSelectChart = -1;
+            var tmpSelectCanvas = -1;
+
+            if (distanceX < statusRadiusArr[0] && distanceY < statusRadiusArr[0]) {
+                tmpSelectChart = idx;
+                tmpSelectCanvas = 0;
+            }
+            if (distanceX < statusRadiusArr[1] && distanceY < statusRadiusArr[1]) {
+                tmpSelectChart = idx;
+                tmpSelectCanvas = 1;
+            }
+            if (distanceX < statusRadiusArr[2] && distanceY < statusRadiusArr[2]) {
+                tmpSelectChart = idx;
+                tmpSelectCanvas = 2;
+            }
+            if (distanceX < statusRadiusArr[3] && distanceY < statusRadiusArr[3]) {
+                tmpSelectChart = idx;
+                tmpSelectCanvas = 3;
+            }
+
+            changeCurCanvasSelection(tmpSelectChart, tmpSelectCanvas);
+
+            strokeChartWithPercentage(tmpMapForPercentage.get(idx), idx);
+
+        };
+    }
+
+    var elementIdForRadius = {
+        "0": "card-bottom-item-cpu-",
+        "1": "card-bottom-item-mem-",
+        "2": "card-bottom-item-swap-",
+        "3": "card-bottom-item-disk-",
+    }
+
+    function changeCurCanvasSelection(chartIdx, radiusIdx) {
+
+        if (chartIdx != curSelectedChartIndex || radiusIdx != curSelectedRadiusIndex) {
+            console.log("change forcus ", chartIdx, radiusIdx)
+            if (chartIdx >= 0) {
+
+                //show hover
+                var hoverEle = document.getElementById(elementIdForRadius[radiusIdx] + chartIdx)
+                hoverEle.classList.add("card-info-item-hover")
+                console.log("show hover ", hoverEle)
+            }
+            if (curSelectedChartIndex >= 0) {
+                //cancel hover
+                var cancelHoverEle = document.getElementById(elementIdForRadius[curSelectedRadiusIndex] + curSelectedChartIndex)
+                cancelHoverEle.classList.remove("card-info-item-hover")
+                console.log("cancel hover ", cancelHoverEle)
+            }
+        }
+
+        curSelectedChartIndex = chartIdx;
+        curSelectedRadiusIndex = radiusIdx;
+    }
+
+    var curDate = new Date();
+    var timeZoneOffsetMSecond = curDate.getTimezoneOffset() * 60 * 1000;
+
+    function chartOfType(numberId, ele) {
+
+        let chartElement = document.createElement("div")
+        chartElement.innerHTML = `
+        <div class="form-back">
+                <div class="form-item" onclick="closePanel()"></div>
+                <div class="form-item form-item-content">
+                    <div style="margin:10px 10px 0px 10px">
+                        <label for="chart-time-start">Start:</label>
+                        <input type="datetime-local" id="chart-time-start">
+                        <label for="chart-time-end">End:</label>
+                        <input type="datetime-local" id="chart-time-end">
+                        <button type="button" class="default-button" style="padding: 5px;border-radius:6px;width: 60px;" onclick="requestForChartWithTime(${numberId})">OK</button>
+                        <button type="button" class="default-button" style="padding: 5px;border-radius:6px;width: 60px;" onclick="closePanel()">Close</button>
+                    </div>
+                    <div id="chart-canvas" style="line-height:20;text-align:center;" class="ct-chart ct-perfect-fourth"></div>
+                </div>
+                <div class="form-item" onclick="closePanel()"></div>
+            </div>
+        `
+
+        showPanelWithElement(chartElement);
+
+        //set default time value
+        let nowDate = Math.floor(Date.now() / 1000) * 1000
+        document.getElementById("chart-time-start").valueAsNumber = nowDate - 1000 * 60 * 60 * 2 - timeZoneOffsetMSecond;
+        document.getElementById("chart-time-end").valueAsNumber = nowDate - timeZoneOffsetMSecond;
+
+        requestForChartWithTime(numberId);
+    }
+
+    function requestForChartWithTime(numberId) {
+
+        requestDataInfoWithAccessToken(function() {
+            return {
+                "TimeStart": document.getElementById("chart-time-start").valueAsNumber + timeZoneOffsetMSecond,
+                "TimeEnd": document.getElementById("chart-time-end").valueAsNumber + timeZoneOffsetMSecond,
+            }
+        }, function(client, data) {
+            //request chart data
+            console.log("request chart of server : ", data)
+
+            client.call(API_CHART_CPU, data, 5000, function(ctx) {
+                if (ctx.data.code === RSP_SUC) {
+                    console.log("Success. ", ctx.data)
+                    showChartWith(serailizeChartData(ctx.data.data))
+
+                } else {
+                    if (ctx.data.code === RSP_FAIL_NOT_CONFIG) {
+                        console.log("Failed, Sever not config ready yet.")
+                    } else {
+                        console.log("Failed with other reasons ", ctx.data)
+                        showChartWith(null)
+                    }
+                }
+            })
+        }, numberId)
+    }
+
+    //func(client, data)
+    function requestDataInfoWithAccessToken(embedTokenDataFunc, func, numberId) {
+        if (mode) {
+            requestInDirectlyMode(embedTokenDataFunc, func, numberId)
+        } else {
+            requestInPublicMode(embedTokenDataFunc, func, numberId)
+        }
+    }
+
+    function requestInPublicMode(embedTokenDataFunc, func, numberId) {
+        let info = sortedServerListsInfos[numberId];
+        let server = null
+        if (serverAddressIdentifyLists) {
+            server = serverAddressIdentifyLists[info.AddressIdentify]
+        }
+
+        let data = embedTokenDataFunc();
+        if (curClientAccessKey != null) {
+            if (server == null || server.IsSelf) {
+                data.AccessKey = curClientAccessKey.AccessKey;
+                func(curClient, data);
+            } else {
+                func(curClient, {
+                    "Address": server.Address,
+                    "Port": server.Port,
+                    "WebPort": server.WebPort,
+                    "AccessKey": curClientAccessKey.AccessKey,
+                    "AddressIdentify": info.AddressIdentify,
+                    "EmbedData": data
+                });
+            }
+
+        } else {
+            showFailed("Need Login.")
+        }
+    }
+
+    function requestInDirectlyMode(embedTokenDataFunc, func, numberId) {
+        let info = sortedServerListsInfos[numberId];
+        let server = null
+        if (serverAddressIdentifyLists) {
+            server = serverAddressIdentifyLists[info.AddressIdentify]
+        }
+        let token = serverTokenInfo[info.AddressIdentify]
+        let client = serverListsAddressClients.get(getAddressFromElement(server))
+
+        let data = embedTokenDataFunc();
+        if (server.IsSelf) {
+            data.AccessKey = curClientAccessKey.AccessKey;
+            func(curClient, data);
+            return;
+        }
+
+        if (token != null && token.AccessKey.length > 0) {
+            func(client, token.AccessKey);
+        } else {
+            if (server.WebPort <= 0) {
+                showFailed("Selected Server do not supported web function.")
+                return
+            }
+            let reqData = JSON.stringify({
+                "AccessKey": curClientAccessKey.AccessKey,
+                "Address": server.Address,
+                "WebPort": server.WebPort,
+            })
+            curClient.call(API_AuthTokenRemote, reqData, 5000, function(ctx) {
+                    console.log("obtain token: ", ctx)
+                    if (ctx.data.code === RSP_SUC) {
+                        serverTokenInfo.set(info.AddressIdentify, ctx.data.data)
+                        data.AccessKey = ctx.data.data.AccessKey;
+                        func(client, data)
+                    } else {
+                        showFailed(ctx.data.data)
+                    }
+                })
+                //request Token
+        }
+
+
+
+    }
+
+    function serailizeChartData(originData) {
+
+        try {
+            var labels = new Array(originData.length)
+            var series1 = new Array()
+            for (let index = 0; index < originData.length; index++) {
+                const element = originData[index];
+                // labels.push(element["CreatedAt"])
+                series1.push(element["AvgPercent"])
+            }
+            labels[0] = originData[0]["CreatedAt"]
+            labels[originData.length - 1] = originData[originData.length - 1]["CreatedAt"]
+
+            console.log("serailze ", {
+                "labels": labels,
+                "series": [
+                    series1
+                ]
+            })
+            return {
+                "labels": labels,
+                "series": [
+                    series1
+                ]
+            }
+        } catch (error) {
+            return null
+        }
+    }
+
+    function showChartWith(data) {
+
+        var chart = document.getElementById("chart-canvas");
+        if (data == null || data["series"][0].length <= 0) {
+            //empty data
+            chart.innerText = "Data Not Found!"
+        } else {
+            chart.innerText = ""
+
+            var responsiveOptions = [
+                ['screen and (min-width: 641px) and (max-width: 1024px)', {
+                    showPoint: false,
+                    axisX: {
+                        labelInterpolationFnc: function(value) {
+                            // Will return Mon, Tue, Wed etc. on medium screens
+                            return value.slice(0, 3);
+                        }
+                    }
+                }],
+                ['screen and (max-width: 640px)', {
+                    showLine: false,
+                    axisX: {
+                        labelInterpolationFnc: function(value) {
+                            // Will return M, T, W etc. on small screens
+                            return value[0];
+                        }
+                    }
+                }]
+            ];
+            new Chartist.Line('.ct-chart', data, {
+                plugins: [
+                    ctPointLabels({
+                        textAnchor: 'middle',
+                        labelInterpolationFnc: function(value) {
+                            return '$' + value.toFixed(2)
+                        }
+                    })
+                ]
+            }, responsiveOptions);
+        }
+    }
+
+    //chart plugins
+    function ctPointLabels(options) {
+        return function ctPointLabels(chart) {
+            var defaultOptions = {
+                labelClass: 'ct-label',
+                labelOffset: {
+                    x: 0,
+                    y: -10
+                },
+                textAnchor: 'middle'
+            };
+
+            options = Chartist.extend({}, defaultOptions, options);
+
+            if (chart instanceof Chartist.Line) {
+                console.log("chart -- ", chart)
+                    // var chartTotalWidth = chart.container.offsetWidth;
+                    // var startX = chart.defaultOptions.axisX["offset"] + chart.defaultOptions.chartPadding["left"];
+                    // var chartLineCanvasWidth = chartTotalWidth - startX - chart.defaultOptions.chartPadding["right"];
+
+                // chart.container.addEventListener("mouseover", function(evt) {
+                //     console.log("evt ", evt);
+                // });
+                // chart.on('mouseover', function(data) {
+                //     console.log("over ", data)
+                //     if (data.type === 'point') {
+                //         data.group.elem('text', {
+                //             x: data.x + options.labelOffset.x,
+                //             y: data.y + options.labelOffset.y,
+                //             style: 'text-anchor: ' + options.textAnchor
+                //         }, options.labelClass).text(data.value);
+                //     }
+                // });
+            }
+        }
+    }
+
+
+    function defaultCardInfo(name) {
+        return JSON.parse(`{
+            "NickName":"${name}",
+            "StartupTime":0,
+            "CPUUsage":0,
+            "SwapUsage":0,
+            "SwapUsed":0,
+            "SwapTotal":0,
+            "MemTotal":0,
+            "MemUsed":0,
+            "MemUsage":0,
+            "DiskUsed":0,
+            "DiskTotal":0,
+            "TrafficSent":0,
+            "TrafficRecv":0,
+            "TrafficRecvTotalPerMonth":0,
+            "TrafficSentTotalPerMonth":0,
+            "TrafficSentTotal":0,
+            "TrafficRecvTotal":0
+        }`)
+    }
+
+
+    function startupFormat(startupTime) {
+        var duration = parseInt(new Date().getTime() / 1000 - startupTime)
+        let year = parseInt(duration / (60 * 60 * 24 * 365));
+        let day = parseInt((duration % (60 * 60 * 24 * 365)) / (60 * 60 * 24));
+        let hour = parseInt((duration % (60 * 60 * 24)) / (60 * 60));
+        let min = parseInt((duration % (60 * 60)) / (60));
+        let sec = parseInt(duration % 60);
+        return (year > 0 ? (year + "年") : "") +
+            (day > 0 ? (day + "天") : "") +
+            (hour > 0 ? (hour + "时") : "") +
+            (min > 0 ? (min + "分") : "") +
+            (sec > 0 ? (sec + "秒") : "");
+    }
+
+    function formatData() {
+        //format date
+        var duration = parseInt(new Date().getTime() / 1000 - this.StartupTime)
+        let year = parseInt(duration / (60 * 60 * 24 * 365));
+        let day = parseInt((duration % (60 * 60 * 24 * 365)) / (60 * 60 * 24));
+        let hour = parseInt((duration % (60 * 60 * 24)) / (60 * 60));
+        let min = parseInt((duration % (60 * 60)) / (60));
+        let sec = parseInt(duration % 60);
+        this.StartupTime = (year > 0 ? (year + "年") : "") +
+            (day > 0 ? (day + "天") : "") +
+            (hour > 0 ? (hour + "时") : "") +
+            (min > 0 ? (min + "分") : "") +
+            (sec > 0 ? (sec + "秒") : "");
+
+        //format bytes
+        this.TrafficSent = this.formatBytes(this.TrafficSent)
+        this.TrafficRecv = this.formatBytes(this.TrafficRecv)
+
+        //format disk
+        this.diskCoverWidth = this.DiskUsed / this.DiskTotal * 100 + "%"
+        this.DiskUsed = this.formatBytes(this.DiskUsed)
+
+        this.DiskTotal = this.formatBytes(this.DiskTotal)
+
+        //format mem
+        this.SwapTotal = this.formatBytes(this.SwapTotal)
+
+        this.MemTotal = this.formatBytes(this.MemTotal)
+        this.memCoverWidth = this.MemUsage + "%"
+
+        console.log("disk ", this.diskCoverWidth, " mem ", this.memCoverWidth)
+
+    }
+
+    let bytesValue = 1024;
+    let kbValue = 1024 * bytesValue;
+    let mbValue = 1024 * kbValue;
+    let gbValue = 1024 * mbValue;
+    let tbValue = 1024 * gbValue;
+
+    function formatBytes(bytes) {
+
+        if (bytes < bytesValue) {
+            return bytes + " B"
+        }
+
+        if (bytes < kbValue) {
+            return (bytes / bytesValue).toFixed(2) + " KB"
+        }
+
+        if (bytes < mbValue) {
+            return (bytes / kbValue).toFixed(2) + " MB"
+        }
+
+        if (bytes < gbValue) {
+            return (bytes / mbValue).toFixed(2) + " GB"
+        }
+
+        if (bytes < tbValue) {
+            return (bytes / gbValue).toFixed(2) + " TB"
+        }
+
+        return (bytes / gbValue).toFixed(2) + " TB"
+    }
+
+    function showFailed(msg) {
+
+        let dismissTime = 3000;
+
+        var dialog = document.createElement("div")
+        dialog.innerHTML = "" +
+            "<div class=\"dialog\">" +
+            "<btn style=\"" +
+            "position: relative;" +
+            "top: 80%;" +
+            "padding: 10px;" +
+            "border-radius: 5px;" +
+            "width: 50%;" +
+            "pointer-events: none;" +
+            "max-width: 300px; " +
+            "background:  lightgray;" +
+            "font-weight: 700;" +
+            "font-size: 20px;\">" +
+            msg + "</btn>" +
+            "</div>";
+
+        document.body.appendChild(dialog);
+        setTimeout(function() {
+            dialog.children[0].classList.add("show");
+        }, 50);
+
+        setTimeout(function() {
+            dialog.children[0].classList.remove("show");
+        }, dismissTime - 300);
+        setTimeout(function() {
+            document.body.removeChild(dialog);
+        }, dismissTime);
+    }
+
+    //Session Manager
+    function SessionReqDataWith(oriData) {
+        return JSON.stringify {
+            oriData
+        }
+    }
+</script>
+
+</html>

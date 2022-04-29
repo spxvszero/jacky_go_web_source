@@ -3,13 +3,13 @@
 
     application.register("home", class extends Stimulus.Controller {
         static get targets() {
-            return [ "name" ]
+            return ["name"]
         }
         connect() {
             //console.log("begin")
             this.backImageConnection()
             var that = this;
-            window.onresize=function (size) {
+            window.onresize = function(size) {
                 //console.log("resize?? ",size);
                 that.changeImg();
             }
@@ -46,12 +46,12 @@
             // console.log("timer fire")
             if (this.canLoadImg && this.animsArr.length <= 0) {
                 this.timeCount++
-                if (this.timeCount % 10 == 0) {
-                    // console.log("draw")
-                    this.cropImageToPiece()
-                    this.imageIndex++
-                    if (this.imageIndex >= this.imageUrlArr.length) { this.imageIndex = 0 }
-                }
+                    if (this.timeCount % 10 == 0) {
+                        // console.log("draw")
+                        this.cropImageToPiece()
+                        this.imageIndex++
+                            if (this.imageIndex >= this.imageUrlArr.length) { this.imageIndex = 0 }
+                    }
             }
         }
 
@@ -217,12 +217,12 @@
             var blogDiv = document.querySelector('.blog-div')
 
             if (this.animsArr.length <= 0) {
-            //     console.log("begin");
-            	var lab = document.querySelector('.lab-div')
-            	var about = document.querySelector('.about-div')
+                //     console.log("begin");
+                var lab = document.querySelector('.lab-div')
+                var about = document.querySelector('.about-div')
 
-            	this.beginFrameAnimation(blogDiv,[lab,about])
-
+                this.beginFrameAnimation(blogDiv, [lab, about])
+                this.loadBlogPage();
             } else {
                 // console.log("reset");
                 // console.log("anim log", this.blogAnimation)
@@ -235,13 +235,13 @@
                 .then(response => response.text())
                 .then(html => {
 
-                	var domparse = new DOMParser();
-                	var doc = domparse.parseFromString(html, "text/html")
+                    var domparse = new DOMParser();
+                    var doc = domparse.parseFromString(html, "text/html")
 
                     var iframe = document.querySelector('.iframe-container')
                     iframe.innerHTML = doc.body.innerHTML
 
-                    for (let i = 0;i<doc.scripts.length;i++){
+                    for (let i = 0; i < doc.scripts.length; i++) {
                         eval(doc.scripts[i].text);
                     }
 
@@ -262,28 +262,44 @@
 
         laboratoryAction() {
 
-
-        	var lab = document.querySelector('.lab-div')
+            var lab = document.querySelector('.lab-div')
             if (this.animsArr.length <= 0) {
-            	var blogDiv = document.querySelector('.blog-div')
-            	var about = document.querySelector('.about-div')
+                var blogDiv = document.querySelector('.blog-div')
+                var about = document.querySelector('.about-div')
 
-            	this.beginFrameAnimation(lab,[blogDiv,about])
-
+                this.beginFrameAnimation(lab, [blogDiv, about])
+                this.loadLaboratoryPage();
             } else {
                 this.resetAction()
             }
 
         }
+        loadLaboratoryPage() {
+            fetch("lab.html")
+                .then(response => response.text())
+                .then(html => {
+
+                    var domparse = new DOMParser();
+                    var doc = domparse.parseFromString(html, "text/html")
+
+                    var iframe = document.querySelector('.iframe-container')
+                    iframe.innerHTML = doc.body.innerHTML
+
+                    for (let i = 0; i < doc.scripts.length; i++) {
+                        eval(doc.scripts[i].text);
+                    }
+
+                })
+        }
 
         aboutAction() {
 
-        	var about = document.querySelector('.about-div')
+            var about = document.querySelector('.about-div')
             if (this.animsArr.length <= 0) {
-            	var blogDiv = document.querySelector('.blog-div')
-            	var lab = document.querySelector('.lab-div')
+                var blogDiv = document.querySelector('.blog-div')
+                var lab = document.querySelector('.lab-div')
 
-            	this.beginFrameAnimation(about,[blogDiv,lab])
+                this.beginFrameAnimation(about, [blogDiv, lab])
 
             } else {
                 this.resetAction()
@@ -329,7 +345,7 @@
 
             let fragment = document.createDocumentFragment();
             let containers = document.getElementsByClassName("iframe-container")[0];
-            if (containers == null){
+            if (containers == null) {
                 containers = document.createElement("div");
                 containers.classList.add("iframe-container", "iframe-custom-box");
                 containers.setAttribute("frameborder", "0");
@@ -342,13 +358,13 @@
                 top = clickEle.getBoundingClientRect().height;
             } else {
                 let x = clickEle.getBoundingClientRect().x;
-                if ( x > 0) {
+                if (x > 0) {
                     if (x > document.body.clientWidth * 0.5) {
                         positionStr = `right:${clickEle.getBoundingClientRect().width}px`;
-                    }else{
+                    } else {
                         top = clickEle.getBoundingClientRect().height;
                     }
-                }else{
+                } else {
                     left = clickEle.getBoundingClientRect().width;
                     positionStr = `left:${left}px`;
                 }
@@ -367,12 +383,10 @@
                 opacity: [.0, 1],
                 duration: 2000,
                 delay: 500,
-                complete : function () {
+                complete: function() {
                     that.titleAnimationComplete = true;
                 }
             });
-
-            this.loadBlogPage();
         }
 
         resetAction() {
@@ -384,13 +398,13 @@
             this.titleAnimationComplete = false;
 
             var that = this;
-            this.animsArr[3].complete = function () {
+            this.animsArr[3].complete = function() {
                 var containers = document.getElementsByClassName("iframe-container")[0];
                 containers.parentNode.removeChild(containers);
                 that.titleAnimationComplete = true;
                 that.animsArr = [];
             };
-            for (var i = 0 ;i < this.animsArr.length ; i++) {
+            for (var i = 0; i < this.animsArr.length; i++) {
                 var anim = this.animsArr[i];
                 // anim.direction = 'reverse';
                 anim.reverse();

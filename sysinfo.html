@@ -1,0 +1,87 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Info</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            row-gap: 10px;
+        }
+        
+        .parallel-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            column-gap: 10px;
+        }
+        
+        .container-title {
+            font-size: 25px;
+            font-weight: 600;
+        }
+        
+        .container-item {
+            border-color: #999;
+            border-style: groove;
+            border-radius: 5px;
+            padding: 10px;
+            flex-grow: 1;
+        }
+        
+        .container-content {
+            display: flex;
+            flex-wrap: wrap;
+            row-gap: 10px;
+            column-gap: 30px;
+        }
+        
+        .container-content-list {
+            display: inherit;
+            flex-basis: 30%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="container-item">
+            <div class="container-title">BaseInfo</div>
+            <div class="container-content" style="max-height: 100px;
+            overflow: auto;">
+                <!-- <div class="container-content-list">
+                    <span>Key:</span>
+                    <span>ValueValueValueValue</span>
+                </div> -->
+
+                {{ range $key, $value := .BaseInfo_Data }}
+                <div class="container-content-list">
+                    <span>{{ $key }}</span>
+                    <span>{{ $value }}</span>
+                </div>
+                {{ end }}
+
+
+            </div>
+        </div>
+
+        <div class="parallel-container">
+            <div class="container-item">
+                <div class="container-title">Process Info</div>
+            </div>
+
+            <div class="container-item">
+                <div class="container-title">Port Info</div>
+            </div>
+        </div>
+
+        <div class="container-item">
+            <div class="container-title">Network Info</div>
+        </div>
+    </div>
+</body>
+
+</html>
